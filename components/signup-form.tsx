@@ -1,32 +1,58 @@
 "use client";
-
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Github } from "lucide-react";
+import { useTheme } from "next-themes";
 import { Globe } from "lucide-react";
 import { signIn } from "next-auth/react";
+
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import axios, { AxiosError } from "axios";
 
-export function LoginForm({
+export function SignUpForm({
   className,
   ...props
 }: React.ComponentPropsWithoutRef<"form">) {
+  const { theme } = useTheme();
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
+  function errorToast(e: string) {
+    toast.error(e);
+  }
+  function successToast(e: string) {
+    toast.success(e);
+  }
+
   async function loginHandler(e: React.FormEvent) {
     e.preventDefault();
-    const handle = await signIn("credentials", {
-      redirect: false,
-      email: email,
-      password: password,
-    });
-    if (handle?.ok) {
+    try {
+      const handle = await axios.post("http://localhost:3000/api/signup", {
+        email: email,
+        password: password,
+      });
+      if (handle.status === 200) successToast(handle.data.message);
       router.push("/");
+    } catch (error) {
+      if (error instanceof AxiosError) {
+        const { response } = error;
+        if (response) {
+          const { status, data } = response;
+          if (status === 400) {
+            errorToast(data.message || "Bad Request");
+          } else {
+            errorToast(
+              data.message || "Something went wrong. Please try again."
+            );
+          }
+        }
+      }
     }
   }
   async function githubHandle(e: React.FormEvent) {
@@ -44,10 +70,11 @@ export function LoginForm({
       className={cn("flex flex-col gap-6", className)}
       {...props}
     >
+      <ToastContainer theme={theme} />
       <div className="flex flex-col items-center gap-2 text-center">
-        <h1 className="text-2xl font-bold">Login to your account</h1>
+        <h1 className="text-2xl font-bold">Signup to create your account</h1>
         <p className="text-balance text-sm text-neutral-500 dark:text-neutral-400">
-          Enter your email below to login to your account
+          Enter your email below to Create your account
         </p>
       </div>
       <div className="grid gap-6">
@@ -83,7 +110,7 @@ export function LoginForm({
           />
         </div>
         <Button type="submit" className="w-full">
-          Login
+          Signup
         </Button>
         <div className="relative text-center text-sm after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center after:border-t after:border-neutral-200 dark:after:border-neutral-800">
           <span className="relative z-10 bg-white px-2 text-neutral-500 dark:bg-neutral-950 dark:text-neutral-400">
@@ -102,9 +129,9 @@ export function LoginForm({
         </div>
       </div>
       <div className="text-center text-sm">
-        Don&apos;t have an account?{" "}
-        <a href="/signup" className="underline underline-offset-4">
-          Sign up
+        Already have an account?{" "}
+        <a href="/signin" className="underline underline-offset-4">
+          Sign In
         </a>
       </div>
     </form>
