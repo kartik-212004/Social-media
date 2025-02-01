@@ -1,44 +1,56 @@
 "use client";
 import {
+  Moon,
+  Sun,
   BellRing,
   HomeIcon,
   Search,
   MessageCircle,
   Pyramid,
 } from "lucide-react";
-import Image from "next/image";
+import { useTheme } from "next-themes";
 import { useSession } from "next-auth/react";
 import { ModeToggle } from "./dark-theme";
 import { Button } from "./ui/button";
 import { User } from "lucide-react";
+import Link from "next/link";
+
 const sidebarData = [
-  { name: "Home", icon: <HomeIcon /> },
-  { name: "Explore", icon: <Search /> },
-  { name: "Notifications", icon: <BellRing /> },
-  { name: "Messages", icon: <MessageCircle /> },
-  { name: "Premium", icon: <Pyramid /> },
-  { name: "Profile", icon: <User /> },
+  { name: "Home", icon: <HomeIcon />, Link: "/" },
+  { name: "Explore", icon: <Search />, Link: "/explore" },
+  { name: "Notifications", icon: <BellRing />, Link: "/notification" },
+  { name: "Messages", icon: <MessageCircle />, Link: "/message" },
+  { name: "Premium", icon: <Pyramid />, Link: "/premium" },
+  { name: "Profile", icon: <User />, Link: "/profile" },
+  ,
 ];
 
 export default function Sidebar() {
   const { data } = useSession();
-
+  const { theme, setTheme } = useTheme();
   return (
     <div className="py-6 w-1/3 flex flex-col min-h-screen justify-between items-end">
       <ul className="space-y-2 ">
         {sidebarData.map((item) => (
-          <li
-            key={item.name}
-            className="flex hover:bg-zinc-900 items-center gap-4 px-5 py-3 rounded-full cursor-pointer transition"
-          >
-            {item.icon}
-            <span className="text-2xl">{item.name}</span>
-          </li>
+          <Link href={item?.Link} key={item.name}>
+            <li className="flex hover:bg-zinc-100 dark:hover:bg-zinc-900 items-center gap-4 px-5 py-3 rounded-full cursor-pointer transition">
+              {item.icon}
+              <span className="text-2xl">{item.name}</span>
+            </li>
+          </Link>
         ))}
+        <li
+          onClick={() => {
+            setTheme(theme == "dark" ? "light" : "dark");
+          }}
+          className="flex hover:bg-zinc-100 dark:hover:bg-zinc-900 items-center gap-4 px-5 py-3 rounded-full cursor-pointer transition"
+        >
+          {theme == "dark" ? <Moon /> : <Sun />}
+          <span className="text-2xl">Theme</span>
+        </li>
         <Button className="w-full rounded-full text-xl py-6">Post</Button>
-        <ModeToggle />
       </ul>
-      <div className="flex flex-row justify-center min-w-min hover:bg-zinc-900 px-3 py-3 rounded-full items-center">
+      <div className="flex flex-row justify-center min-w-min hover:bg-zinc-100 dark:hover:bg-zinc-900 px-3 py-3 rounded-full items-center">
         <div className="flex items-center gap-3">
           <img
             width={40}
