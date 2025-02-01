@@ -72,7 +72,7 @@ export function SignUpForm({
     >
       <ToastContainer theme={theme} />
       <div className="flex flex-col items-center gap-2 text-center">
-        <h1 className="text-2xl font-bold">Signup to create your account</h1>
+        <h1 className="text-2xl font-bold">Create your account</h1>
         <p className="text-balance text-sm text-neutral-500 dark:text-neutral-400">
           Enter your email below to Create your account
         </p>
