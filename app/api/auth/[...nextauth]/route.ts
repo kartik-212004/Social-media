@@ -66,11 +66,13 @@ const handler = NextAuth({
     strategy: "jwt",
   },
   callbacks: {
-    async session({ session }) {
+    async session({ session, token }) {
       if (session && session.user) {
         console.log({ session });
         if (session.user.image == null) {
-          session.user.image = "https://th.bing.com/th/id/OIP.S171c9HYsokHyCPs9brbPwHaGP?rs=1&pid=ImgDetMain";
+          session.user.name = "No name";
+          session.user.image =
+            "https://th.bing.com/th/id/OIP.S171c9HYsokHyCPs9brbPwHaGP?rs=1&pid=ImgDetMain";
         }
       }
 
