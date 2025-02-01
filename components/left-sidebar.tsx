@@ -116,7 +116,7 @@ export default function Sidebar() {
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
-      <Post on={toggle} />
+      <Post onOpenChange={setToggle} on={toggle} />
     </div>
   );
 }
