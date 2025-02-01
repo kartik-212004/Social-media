@@ -66,7 +66,7 @@ const handler = NextAuth({
     strategy: "jwt",
   },
   callbacks: {
-    async session({ session, token }) {
+    async session({ session }) {
       if (session && session.user) {
         console.log({ session });
         if (session.user.image == null) {

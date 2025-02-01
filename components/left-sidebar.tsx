@@ -44,13 +44,16 @@ export default function Sidebar() {
   const [toggle, setToggle] = useState(false);
   const { data, status } = useSession();
   const { theme, setTheme } = useTheme();
-  // useEffect(() => {
-  //   if (status == "unauthenticated") {
-  //     Router.push("/signin");
-  //   }
-  // }, [status]);
+  useEffect(() => {
+    if (status == "unauthenticated") {
+      Router.push("/signin");
+    }
+  }, [status, Router]);
   return status == "loading" ? (
-    <Skeleton className="w-[100px] h-[20px] rounded-full" />
+    <div className="flex justify-center items-center w-screen h-screen">
+      {" "}
+      <Skeleton className="w-[100px] h-[20px] rounded-full" />
+    </div>
   ) : (
     <div className="py-6 w-1/3 flex flex-col min-h-screen justify-between items-end">
       <ul className="space-y-2 ">
@@ -96,7 +99,7 @@ export default function Sidebar() {
             </div>
           </div>
         </DropdownMenuTrigger>
-        <DropdownMenuContent>
+        <DropdownMenuContent className="bg-transparent dark:bg-background-dark">
           <DropdownMenuItem className="flex flex-row ">
             <Settings />
             Settings
