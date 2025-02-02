@@ -1,13 +1,20 @@
 "use client";
 
-import { PenBox } from "lucide-react";
-import React, { useState, useRef } from "react";
+import { Pen } from "lucide-react";
+import React, { useState, useRef, useEffect } from "react";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import { Camera, X } from "lucide-react";
+import { Camera} from "lucide-react";
 import Sidebar from "@/components/left-sidebar";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useSession } from "next-auth/react";
 import { CheckCheckIcon } from "lucide-react";
+
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+} from "@/components/ui/dropdown-menu";
 
 export default function Account() {
   const { data: session, status } = useSession();
@@ -15,9 +22,17 @@ export default function Account() {
     session?.user?.image || null
   );
   const [isUploading, setIsUploading] = useState(false);
-  const [name, setname] = useState("");
+  const [name, setName] = useState(session?.user?.name); // Set fallback value
   const [handleReadOnly, setReadOnly] = useState(true);
   const fileInputRef = useRef(null);
+
+  // Update name state when session changes
+  useEffect(() => {
+    if (session?.user?.name) {
+      setName(session.user.name);
+    }
+  }, [session]);
+
   const handleName = () => {
     setReadOnly((read) => !read);
   };
@@ -32,12 +47,7 @@ export default function Account() {
     reader.readAsDataURL(file);
 
     try {
-      // Example API call for uploading
-      // const formData = new FormData();
-      // formData.append('image', file);
-      // const response = await fetch('/api/update-profile-photo', { method: 'POST', body: formData });
-      // const data = await response.json();
-      // if (!response.ok) throw new Error("Failed to upload");
+      // Handle API call for uploading image (if required)
     } catch (error) {
       console.error("Error uploading image:", error);
     } finally {
@@ -45,14 +55,9 @@ export default function Account() {
     }
   };
 
-  const removeImage = async () => {
+  const removeImage = () => {
     setImagePreview(null);
-    try {
-      // Example API call for removing
-      // await fetch('/api/remove-profile-photo', { method: 'DELETE' });
-    } catch (error) {
-      console.error("Error removing image:", error);
-    }
+    // Handle API call to remove image (if required)
   };
 
   if (status === "loading") {
@@ -70,86 +75,87 @@ export default function Account() {
         <h1 className="text-3xl ">Account Settings</h1>
         <div className="flex space-x-8 flex-row items-start">
           <div className="relative">
-            <Avatar className="w-40 h-40">
-              <AvatarImage
-                src={imagePreview || session?.user?.image}
-                className={isUploading ? "opacity-50" : ""}
-                alt="User Avatar"
-              />
-              <AvatarFallback className="bg-gray-100">
-                <Camera className="w-12 h-12 text-gray-400" />
-              </AvatarFallback>
-            </Avatar>
+            <DropdownMenu>
+              <DropdownMenuTrigger>
+                <Avatar className="w-40 h-40">
+                  <AvatarImage
+                    src={imagePreview || session?.user?.image}
+                    className={isUploading ? "opacity-50" : ""}
+                    alt="User Avatar"
+                  />
+                  <AvatarFallback className="bg-gray-100">
+                    <Camera className="w-12 h-12 text-gray-400" />
+                  </AvatarFallback>
+                </Avatar>
+              </DropdownMenuTrigger>
 
-            <button
-              onClick={() => fileInputRef.current?.click()}
-              className="absolute bottom-0 right-0 p-2 rounded-full bg-white shadow-md hover:bg-gray-50 disabled:opacity-50"
-              disabled={isUploading}
-            >
-              <Camera className="w-4 h-4 text-gray-600" />
-            </button>
+              <DropdownMenuContent>
+                <DropdownMenuItem>View Photo</DropdownMenuItem>
+                <DropdownMenuItem onClick={removeImage}>
+                  Delete
+                </DropdownMenuItem>
+                <DropdownMenuItem>
+                  <label htmlFor="fileInput" className="cursor-pointer">
+                    Change Photo
+                  </label>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
 
             <input
               ref={fileInputRef}
               type="file"
+              id="fileInput"
               className="hidden"
               accept="image/*"
               onChange={handleImageUpload}
               disabled={isUploading}
             />
-
-            {imagePreview && (
-              <button
-                onClick={removeImage}
-                className="absolute -top-2 -right-2 p-1.5 rounded-full bg-red-500 text-white hover:bg-red-600 disabled:opacity-50"
-                disabled={isUploading}
-              >
-                <X className="w-4 h-4" />
-              </button>
-            )}
           </div>
 
           <div className="flex h-40 flex-col justify-center space-y-1">
-            <h1 className="text-xl ">{session?.user?.name || "Kartik"}</h1>
+            <h1 className="text-xl ">{name || "Kartik"}</h1>
             <h6 className="text-lg">
               {session?.user?.email || "kartik200421@gmail.com"}
             </h6>
           </div>
         </div>
+
         <div>
           <label className="block dark:text-white text-sm font-medium text-gray-700 read-only:outline-none">
             Name
           </label>
           <div className="flex flex-row items-center space-x-3 border-gray-300 shadow-sm">
             <input
-              onChange={(e) => {
-                setname(e.target.value);
-              }}
+              onChange={(e) => setName(e.target.value)}
               readOnly={handleReadOnly}
               type="text"
-              defaultValue={session?.user?.name || "Kartik"}
-              className={`mt-1 outline-none block w-full rounded-md p-2 ${
+              value={name}
+              className={`mt-1 outline-none block w-full  p-2 ${
                 handleReadOnly
-                  ? "ring-0" 
-                  : "ring-2 ring-gray-700 rounded-[4px]" 
+                  ? "ring-0"
+                  : "ring-1 dark:ring-gray-400 ring-gray-700 rounded-[4px]"
               }`}
             />
             {!handleReadOnly && <CheckCheckIcon onClick={handleName} />}
-            <PenBox onClick={handleName} />
+            {handleReadOnly && <Pen onClick={handleName} />}
           </div>
         </div>
+
         <div>
           <label className="block text-sm font-medium dark:text-white text-gray-700 read-only:outline-none">
             Email
           </label>
           <input
             type="email"
-            defaultValue={session?.user?.email || "kartik200421@gmail.com"}
+            value={session?.user?.email || "kartik200421@gmail.com"}
             className="mt-1 block w-full outline-none cursor-not-allowed rounded-md p-2"
+            readOnly
           />
         </div>
+
         <div>
-          <label className="block text-sm font-medium text-gray-700   dark:text-white">
+          <label className="block text-sm font-medium text-gray-700 dark:text-white">
             Password
           </label>
           <input
