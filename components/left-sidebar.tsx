@@ -44,18 +44,18 @@ export default function Sidebar() {
   const [toggle, setToggle] = useState(false);
   const { data, status } = useSession();
   const { theme, setTheme } = useTheme();
-  useEffect(() => {
-    if (status == "unauthenticated") {
-      Router.push("/signin");
-    }
-  }, [status, Router]);
+  // useEffect(() => {
+  //   if (status == "unauthenticated") {
+  //     Router.push("/signin");
+  //   }
+  // }, [status, Router]);
   return status == "loading" ? (
     <div className="flex justify-center items-center w-screen h-screen">
       {" "}
       <Skeleton className="w-[100px] h-[20px] rounded-full" />
     </div>
   ) : (
-    <div className="py-6 w-1/3 flex flex-col min-h-screen justify-between items-end">
+    <div className="py-6 border-r-2 dark:border-zinc-800 pr-10 w-1/3 flex flex-col min-h-screen justify-between items-end">
       <ul className="space-y-2 ">
         {sidebarData.map((item) => (
           <Link href={item?.Link} key={item.name}>
@@ -100,14 +100,18 @@ export default function Sidebar() {
           </div>
         </DropdownMenuTrigger>
         <DropdownMenuContent className="bg-transparent dark:bg-background-dark">
-          <DropdownMenuItem className="flex flex-row ">
-            <Settings />
-            Settings
-          </DropdownMenuItem>
-          <DropdownMenuItem className="flex flex-row ">
-            <User />
-            Account
-          </DropdownMenuItem>
+          <Link href={"/settings"}>
+            <DropdownMenuItem className="flex flex-row ">
+              <Settings />
+              Settings
+            </DropdownMenuItem>
+          </Link>
+          <Link href={"/account"}>
+            <DropdownMenuItem className="flex flex-row ">
+              <User />
+              Account
+            </DropdownMenuItem>
+          </Link>
           <DropdownMenuItem
             onClick={() => {
               signOut({ callbackUrl: "/signin" });
