@@ -40,6 +40,7 @@ const handler = NextAuth({
             password: string;
             email: string;
             image: string | null;
+            name: string | null;
             createdAt: Date;
           } | null = await prisma.user.findUnique({
             where: { email: email },
@@ -54,6 +55,7 @@ const handler = NextAuth({
             return {
               email: user.email,
               image: user.image || null,
+              name: user.name,
             };
           }
         } catch (error) {
@@ -65,12 +67,16 @@ const handler = NextAuth({
   session: {
     strategy: "jwt",
   },
+  secret: "kartikbhatt",
   callbacks: {
     async session({ session }) {
-      if (session && session.user) {
-        console.log({ session });
-        if (session.user.image == null) {
-          session.user.name = "No name";
+      if (session?.user?.email) {
+        const user = await prisma.user.findUnique({
+          where: { email: session.user.email },
+        });
+
+        if (user) {
+          session.user.name = user.name;
           session.user.image =
             "https://th.bing.com/th/id/OIP.S171c9HYsokHyCPs9brbPwHaGP?rs=1&pid=ImgDetMain";
         }
