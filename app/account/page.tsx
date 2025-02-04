@@ -55,7 +55,9 @@ export default function Account() {
     reader.readAsDataURL(file);
 
     try {
-      // Implement image upload API call
+      const response = await axios.post("/api/profile", {
+        photo: imagePreview,
+      });
     } catch (error) {
       console.error("Error uploading image:", error);
     } finally {
