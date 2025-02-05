@@ -83,9 +83,9 @@ export default function Account() {
   }
 
   return (
-    <div className="container flex flex-row">
+    <div className="container mx-auto flex flex-row">
       <Sidebar />
-      <div className="flex w-2/3 p-16 space-y-4 flex-col">
+      <div className="flex w-[83.33%] dark:border-zinc-800 border-l-2 min-h-screen p-16 space-y-4 relative flex-col">
         <h1 className="text-3xl">Account Settings</h1>
 
         <div className="flex space-x-8 flex-row items-start">

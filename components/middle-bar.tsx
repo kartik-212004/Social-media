@@ -16,9 +16,9 @@ export default function Middlebar() {
   };
 
   return (
-    <div className="border-x-2 dark:border-zinc-800 w-1/2 relative">
-      <div className="sticky top-0 z-10  ">
-        <div className="flex dark:border-b-2 dark:border-zinc-800 flex-row w-full">
+    <div className="border-x-2 min-h-screen dark:border-zinc-800 w-1/2 relative">
+      <div className="sticky top-0   ">
+        <div className="flex border-y-2 dark:bg-[#121212] dark:border-zinc-800 flex-row w-full">
           <button className="w-1/2 dark:hover:bg-zinc-900 hover:bg-zinc-100 py-4">
             For you
           </button>
