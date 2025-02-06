@@ -101,12 +101,6 @@ export default function Sidebar() {
             </div>
           </DropdownMenuTrigger>
           <DropdownMenuContent className="bg-transparent dark:bg-background-dark">
-            <Link href={"/settings"}>
-              <DropdownMenuItem className="flex flex-row ">
-                <Settings />
-                Settings
-              </DropdownMenuItem>
-            </Link>
             <Link href={"/account"}>
               <DropdownMenuItem className="flex flex-row ">
                 <User />

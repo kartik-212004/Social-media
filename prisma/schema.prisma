@@ -16,6 +16,16 @@ datasource db {
 model user {
   id        String   @id @default(uuid())
   email     String   @unique
+  name      String?
   password  String
   createdAt DateTime @default(now())
+  post      Post[]
+}
+
+model Post {
+  id      String  @id @default(uuid())
+  Caption String
+  likes   String?
+  user    user?   @relation(fields: [userId], references: [id])
+  userId  String?
 }
