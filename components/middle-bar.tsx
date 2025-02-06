@@ -1,13 +1,18 @@
 import { useSession } from "next-auth/react";
 import { Avatar, AvatarImage, AvatarFallback } from "./ui/avatar";
-import { Camera } from "lucide-react";
-import { useRef } from "react";
+import { Camera, Heart } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import axios from "axios";
 
 export default function Middlebar() {
-  const { data } = useSession();
-  const textAreaRef = useRef(null);
+  const { data: session } = useSession();
+  const textAreaRef = useRef<HTMLTextAreaElement>(null);
+  const [caption, setCaption] = useState("");
+  const [fetchPost, setFetchPost] = useState([]);
+  const [isPosting, setIsPosting] = useState(false);
 
-  const handleInput = (e) => {
+  const handleInput = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setCaption(e.target.value);
     const textarea = textAreaRef.current;
     if (textarea) {
       textarea.style.height = "auto";
@@ -15,24 +20,56 @@ export default function Middlebar() {
     }
   };
 
+  async function handlePost() {
+    if (caption.trim() && !isPosting) {
+      setIsPosting(true);
+      try {
+        await axios.post("/api/post", {
+          caption: caption.trim(),
+          email: session?.user?.email,
+        });
+
+        await fetchPosts();
+        setCaption("");
+      } catch (error) {
+        console.error("Post failed:", error);
+      } finally {
+        setIsPosting(false);
+      }
+    }
+  }
+
+  async function fetchPosts() {
+    try {
+      const response = await axios.get("/api/getpost");
+      setFetchPost(response.data.post);
+    } catch (error) {
+      console.error("Fetch posts failed:", error);
+    }
+  }
+
+  useEffect(() => {
+    fetchPosts();
+  }, []);
+
   return (
     <div className="border-x-2 min-h-screen dark:border-zinc-800 w-1/2 relative">
-      <div className="sticky top-0   ">
+      <div className="sticky top-0">
         <div className="flex border-y-2 dark:bg-[#121212] dark:border-zinc-800 flex-row w-full">
           <button className="w-1/2 dark:hover:bg-zinc-900 hover:bg-zinc-100 py-4">
             For you
           </button>
           <button className="w-1/2 dark:hover:bg-zinc-900 hover:bg-zinc-100 py-4">
-            Following
+            My Posts
           </button>
         </div>
       </div>
 
       <div className="mt-2 p-5 border-b-2 dark:border-zinc-800">
-        <div className="Post py-4 flex flex-row">
-          <div className="w-[10%]">
+        <div className="Post py-4 flex flex-row items-start">
+          <div className="w-[10%] mr-4">
             <Avatar>
-              <AvatarImage src={data?.user?.image} alt="User Avatar" />
+              <AvatarImage src={session?.user?.image || ""} alt="User Avatar" />
               <AvatarFallback>
                 <Camera />
               </AvatarFallback>
@@ -42,19 +79,53 @@ export default function Middlebar() {
           <div className="w-4/5">
             <textarea
               ref={textAreaRef}
+              value={caption}
               rows={1}
               placeholder="What's happening?"
-              className="w-full bg-transparent resize-none overflow-hidden border-b-2 border-zinc-700 focus:outline-none p-2"
+              className="w-full bg-transparent placeholder:text-xl text-2xl resize-none overflow-hidden border-b-2 border-zinc-700 focus:outline-none p-2"
               onChange={handleInput}
-              onInput={handleInput}
             />
           </div>
         </div>
         <div className="flex w-full justify-end">
-          <button className="py-2 px-5 rounded-3xl font-medium bg-blue-500 text-white hover:bg-blue-600 transition-colors">
-            POST
+          <button
+            onClick={handlePost}
+            disabled={!caption.trim() || isPosting}
+            className="py-2 px-5 rounded-3xl font-medium 
+              bg-blue-500 text-white 
+              hover:bg-blue-600 
+              disabled:opacity-50 disabled:cursor-not-allowed 
+              transition-colors"
+          >
+            {isPosting ? "Posting..." : "POST"}
           </button>
         </div>
+      </div>
+
+      <div className="divide-y divide-zinc-200 dark:divide-zinc-800">
+        {fetchPost.map((post) => (
+          <div key={post.id} className="p-4 px-6 flex items-start space-x-4">
+            <Avatar className="mt-2">
+              <AvatarImage src={post.user?.image || ""} alt="User Avatar" />
+              <AvatarFallback>
+                <Camera />
+              </AvatarFallback>
+            </Avatar>
+            <div className="flex-1">
+              <div className="flex items-center space-x-2">
+                <span className="font-semibold">{post.user?.name}</span>
+                <span className="text-zinc-500 text-sm">
+                  {new Date(post.createdAt).toLocaleString()}
+                </span>
+              </div>
+              <p className="mt-2">{post.Caption}</p>
+              <div className="mt-2 flex items-center space-x-2">
+                <Heart className="text-zinc-500 hover:text-red-500 cursor-pointer" />
+                <span className="text-zinc-500">0</span>
+              </div>
+            </div>
+          </div>
+        ))}
       </div>
     </div>
   );
