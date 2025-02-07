@@ -19,6 +19,7 @@ export async function POST(req: NextRequest) {
     where: {
       userId: userId.id,
     },
+    include: { user: true },
   });
   return NextResponse.json(
     { message: "Posts Fetched", posts: posts },

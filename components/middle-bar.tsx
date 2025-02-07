@@ -17,22 +17,25 @@ type Post = {
 export default function Middlebar() {
   const { data: session } = useSession();
   const textAreaRef = useRef<HTMLTextAreaElement>(null);
-  
+
   const [caption, setCaption] = useState("");
   const [fetchPost, setFetchPost] = useState<Post[]>([]);
   const [userpost, setUserPost] = useState<Post[]>([]);
   const [isPosting, setIsPosting] = useState(false);
   const [tabBar, setTabBar] = useState(true);
 
-  const handleInput = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    const textarea = textAreaRef.current;
-    setCaption(e.target.value);
-    
-    if (textarea) {
-      textarea.style.height = "auto";
-      textarea.style.height = `${textarea.scrollHeight}px`;
-    }
-  }, []);
+  const handleInput = useCallback(
+    (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+      const textarea = textAreaRef.current;
+      setCaption(e.target.value);
+
+      if (textarea) {
+        textarea.style.height = "auto";
+        textarea.style.height = `${textarea.scrollHeight}px`;
+      }
+    },
+    []
+  );
 
   const fetchPosts = useCallback(async () => {
     try {
@@ -88,7 +91,9 @@ export default function Middlebar() {
       </Avatar>
       <div className="flex-1">
         <div className="flex items-center space-x-2">
-          <span className="font-semibold">{post.user?.name}</span>
+          <span className="font-semibold">
+            {post.user?.name || post.user?.name}
+          </span>
           <span className="text-zinc-500 text-sm">
             {new Date(post.createdAt).toLocaleString()}
           </span>
