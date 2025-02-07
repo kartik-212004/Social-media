@@ -22,6 +22,7 @@ export function SignUpForm({
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [name, setname] = useState("");
 
   function errorToast(e: string) {
     toast.error(e);
@@ -36,6 +37,7 @@ export function SignUpForm({
       const handle = await axios.post("http://localhost:3000/api/signup", {
         email: email,
         password: password,
+        name: name,
       });
       if (handle.status === 200) successToast(handle.data.message);
       router.push("/");
@@ -78,6 +80,18 @@ export function SignUpForm({
         </p>
       </div>
       <div className="grid gap-6">
+        <div className="grid gap-2">
+          <Label htmlFor="name">Name</Label>
+          <Input
+            onChange={(e) => {
+              setname(e.target.value);
+            }}
+            id="name"
+            type="text"
+            placeholder="kartik"
+            required
+          />
+        </div>
         <div className="grid gap-2">
           <Label htmlFor="email">Email</Label>
           <Input

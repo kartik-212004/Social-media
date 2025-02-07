@@ -30,10 +30,10 @@ export default function Post({ on, onOpenChange }: post) {
           </div>
           <div className="w-5/6 pr-7 space-y-6">
             <DialogTitle className="text-2xl"> Create a Post</DialogTitle>
-            <DialogDescription className="">
+            <DialogDescription>
               <textarea
                 placeholder="Anything new"
-                className="w-full min-h-[30vh] text-xl placeholder:text-xl bg-transparent dark:bg-background-dark focus:outline-none resize-none placeholder:text-muted-foreground"
+                className="w-full min-h-[30vh] dark:text-white text-black text-xl placeholder:text-xl bg-transparent dark:bg-background-dark focus:outline-none resize-none placeholder:text-muted-foreground"
               />
             </DialogDescription>
           </div>

@@ -36,14 +36,35 @@ import { useSession, signOut } from "next-auth/react";
 import { Button } from "./ui/button";
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import axios from "axios";
 import Post from "./post";
 import { Skeleton } from "./ui/skeleton";
 
 export default function Sidebar() {
   const Router = useRouter();
   const [toggle, setToggle] = useState(false);
+  const [caption, setCaption] = useState("");
   const { data, status } = useSession();
+  const [isPosting, setIsPosting] = useState(false);
   const { theme, setTheme } = useTheme();
+
+  async function handlePost() {
+    if (caption.trim() && !isPosting) {
+      setIsPosting(true);
+      try {
+        await axios.post("/api/post", {
+          caption: caption.trim(),
+          email: session?.user?.email,
+        });
+        setCaption("");
+      } catch (error) {
+        console.error("Post failed:", error);
+      } finally {
+        setIsPosting(false);
+      }
+    }
+  }
+
   // useEffect(() => {
   //   if (status == "unauthenticated") {
   //     Router.push("/signin");

@@ -12,7 +12,7 @@ const userSchema = z.object({
 export async function POST(req: NextRequest) {
   const data = await req.json();
   const result = userSchema.safeParse(data);
-  const { email, password } = data;
+  const { email, password, name } = data;
   try {
     if (!result.success) {
       console.log(result.error.issues[0].message);
@@ -42,7 +42,7 @@ export async function POST(req: NextRequest) {
       id: string;
       createdAt: Date;
     } = await prisma.user.create({
-      data: { email: email, password: hashing },
+      data: { email: email, password: hashing, name: name },
       select: { email: true, password: false, id: true, createdAt: true },
     });
     console.log(db);
