@@ -28,7 +28,6 @@ export async function POST(req: NextRequest) {
     });
 
     if (existingUser) {
-      console.log(existingUser);
       return NextResponse.json(
         { message: "User Already Exists", status: 400 },
         { status: 400 }
@@ -45,7 +44,6 @@ export async function POST(req: NextRequest) {
       data: { email: email, password: hashing, name: name },
       select: { email: true, password: false, id: true, createdAt: true },
     });
-    console.log(db);
     return NextResponse.json(
       {
         message: "Account Created Successfully",

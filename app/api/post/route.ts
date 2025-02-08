@@ -24,5 +24,6 @@ export async function POST(req: NextRequest) {
       },
     },
   });
+  console.log(newPost);
   return NextResponse.json({ message: "Post Successfull" });
 }

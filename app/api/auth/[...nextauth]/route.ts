@@ -4,7 +4,9 @@ import NextAuth from "next-auth";
 import Google from "next-auth/providers/google";
 import Github from "next-auth/providers/github";
 import { PrismaClient } from "@prisma/client";
+
 const prisma = new PrismaClient();
+
 const handler = NextAuth({
   providers: [
     Github({
@@ -33,33 +35,31 @@ const handler = NextAuth({
         try {
           const { email, password } = credentials;
           if (!email || !password) {
-            throw new Error("Please Fill The Page Properly");
+            throw new Error("Please fill the fields correctly.");
           }
-          const user: {
-            id?: string;
-            password: string;
-            email: string;
-            image: string | null;
-            name: string | null;
-            createdAt: Date;
-          } | null = await prisma.user.findUnique({
-            where: { email: email },
+
+          const user = await prisma.user.findUnique({
+            where: { email },
           });
 
-          if (user == null) {
-            return null;
+          if (!user || !user.password) {
+            throw new Error("Invalid credentials.");
           }
 
-          const compare = await bcrypt.compare(password, user?.password);
-          if (compare) {
-            return {
-              email: user.email,
-              image: user.image || null,
-              name: user.name,
-            };
+          const isPasswordValid = await bcrypt.compare(password, user.password);
+          if (!isPasswordValid) {
+            throw new Error("Invalid credentials.");
           }
+
+          return {
+            id: user.id, // ✅ Include user ID
+            email: user.email,
+            name: user.name,
+            image: user.image || null,
+          };
         } catch (error) {
-          console.log(error);
+          console.error(error);
+          return null;
         }
       },
     }),
@@ -69,24 +69,47 @@ const handler = NextAuth({
   },
   secret: "kartikbhatt",
   callbacks: {
-    async session({ session }) {
-      if (session?.user?.email) {
-        const user = await prisma.user.findUnique({
-          where: { email: session.user.email },
+    async signIn({ user, account }) {
+      if (!user.email) return false;
+
+      if (account?.provider !== "credentials") {
+        let existingUser = await prisma.user.findUnique({
+          where: { email: user.email },
         });
 
-        if (user) {
-          session.user.name = user.name;
-          session.user.image =
-            "https://th.bing.com/th/id/OIP.S171c9HYsokHyCPs9brbPwHaGP?rs=1&pid=ImgDetMain";
+        if (!existingUser) {
+          existingUser = await prisma.user.create({
+            data: {
+              email: user.email,
+              name: user.name,
+              password: null, // ✅ OAuth users don't have passwords
+            },
+          });
         }
       }
 
+      return true;
+    },
+    async session({ session, token }) {
+      if (session?.user) {
+        session.user.id = token.id;
+        session.user.image =
+          session.user.image ??
+          "https://th.bing.com/th/id/OIP.S171c9HYsokHyCPs9brbPwHaGP?rs=1&pid=ImgDetMain";
+      }
+
       return session;
+    },
+    async jwt({ token, user }) {
+      if (user) {
+        token.id = user.id;
+      }
+      return token;
     },
   },
   pages: {
     signIn: "/signin",
   },
 });
+
 export { handler as GET, handler as POST };

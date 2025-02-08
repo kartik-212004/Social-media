@@ -15,7 +15,6 @@ export async function GET() {
       },
     },
   });
-  console.log(newPost);
 
   return NextResponse.json({ message: "Post Successfull", post: newPost });
 }

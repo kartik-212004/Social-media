@@ -2,6 +2,7 @@ import { useSession } from "next-auth/react";
 import { Avatar, AvatarImage, AvatarFallback } from "./ui/avatar";
 import { Camera, Heart } from "lucide-react";
 import { useEffect, useRef, useState, useCallback } from "react";
+import { Skeleton } from "./ui/skeleton";
 import axios from "axios";
 
 type Post = {
@@ -128,9 +129,9 @@ export default function Middlebar() {
 
       {tabBar ? (
         <div>
-          <div className="mt-2 p-5 border-b-2 dark:border-zinc-800">
-            <div className="Post py-4 flex flex-row items-start">
-              <div className="w-[10%] mr-4">
+          <div className=" px-2 py-1 border-b-2 dark:border-zinc-800">
+            <div className="Post py-2 flex flex-row items-start">
+              <div className="mx-2">
                 <Avatar>
                   <AvatarImage
                     src={session?.user?.image || ""}
@@ -172,6 +173,8 @@ export default function Middlebar() {
             {fetchPost.map(renderPostItem)}
           </div>
         </div>
+      ) : !userpost ? (
+        <Skeleton />
       ) : (
         <div className="divide-y divide-zinc-200 dark:divide-zinc-800">
           {userpost.length > 0 ? (

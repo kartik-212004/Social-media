@@ -17,7 +17,7 @@ model user {
   id        String   @id @default(uuid())
   email     String   @unique
   name      String?
-  password  String
+  password  String?
   createdAt DateTime @default(now())
   post      Post[]
 }

@@ -8,9 +8,8 @@ export async function POST(req: NextRequest) {
     where: { email: email },
     data: { name: name },
   });
-  console.log(modifiedName);
   return NextResponse.json(
-    { message: "Name Updated Successfully", name: name },
+    { message: "Name Updated Successfully", name: modifiedName.name },
     { status: 200 }
   );
 }

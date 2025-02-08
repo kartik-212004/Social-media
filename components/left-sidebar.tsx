@@ -8,7 +8,6 @@ import {
   Search,
   MessageCircle,
   Pyramid,
-  Settings,
   LogOut,
   User,
 } from "lucide-react";
@@ -47,6 +46,12 @@ export default function Sidebar() {
   const { data, status } = useSession();
   const [isPosting, setIsPosting] = useState(false);
   const { theme, setTheme } = useTheme();
+  console.log(data?.user?.image);
+
+  function handleOnclick() {
+    handlePost();
+    setToggle((prevToggle) => !prevToggle);
+  }
 
   async function handlePost() {
     if (caption.trim() && !isPosting) {
@@ -54,7 +59,7 @@ export default function Sidebar() {
       try {
         await axios.post("/api/post", {
           caption: caption.trim(),
-          email: session?.user?.email,
+          email: data?.user?.email,
         });
         setCaption("");
       } catch (error) {
@@ -97,7 +102,7 @@ export default function Sidebar() {
             <span className="text-2xl">Theme</span>
           </li>
           <Button
-            onClick={() => setToggle((prevToggle) => !prevToggle)}
+            onClick={() => handleOnclick()}
             className="w-full rounded-full text-xl py-6"
           >
             Post
