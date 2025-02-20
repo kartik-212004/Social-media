@@ -13,14 +13,18 @@ import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useSession } from "next-auth/react";
 import axios from "axios";
+import { useToast } from "@/hooks/use-toast";
 import Sidebar from "@/components/left-sidebar";
 
 export default function Account() {
   const { data: session, status, update } = useSession();
+  const { toast } = useToast();
   const [handlePasswordfield, setHandlePasswordField] = useState(true);
   const [isUploading, setIsUploading] = useState(false);
+  const [Passwordvalue, setPasswordValue] = useState("");
   const [isNameEditable, setIsNameEditable] = useState(false);
   const [username, setUsername] = useState(session?.user?.name || "user");
+  const [isPasswordEditable, setisPasswordEditable] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [imagePreview, setImagePreview] = useState(
     session?.user?.image || null
@@ -31,7 +35,7 @@ export default function Account() {
       if (!session?.user?.email) return;
 
       try {
-        const response = await axios.post("/api/minor/user", {
+        const response = await axios.post("/api/minor/user/getpassword", {
           email: session.user.email,
         });
 
@@ -53,6 +57,10 @@ export default function Account() {
     toggleNameEdit();
     RequesttoUpdateName();
   }
+  function both2() {
+    UpdatePassword();
+    togglePasswordEdit();
+  }
 
   useEffect(() => {
     if (session?.user?.name) {
@@ -65,6 +73,26 @@ export default function Account() {
       name: username,
       email: session?.user?.email,
     });
+    await update();
+  }
+  async function UpdatePassword() {
+    try {
+      const response = await axios.post("/api/minor/user/changepassword", {
+        email: session?.user?.email,
+        password: Passwordvalue,
+      });
+      const UpdatedPassword = await response.data;
+      if (UpdatedPassword.status) {
+        toast({
+          title: UpdatedPassword.message,
+        });
+      } else
+        toast({
+          title: UpdatedPassword.message,
+        });
+    } catch (error) {
+      console.log(error);
+    }
     await update();
   }
 
@@ -97,6 +125,9 @@ export default function Account() {
 
   const toggleNameEdit = () => {
     setIsNameEditable(!isNameEditable);
+  };
+  const togglePasswordEdit = () => {
+    setisPasswordEditable(!isPasswordEditable);
   };
 
   if (status === "loading") {
@@ -154,7 +185,17 @@ export default function Account() {
             <h6 className="text-lg">{session?.user?.email}</h6>
           </div>
         </div>
-
+        <div>
+          <label className="block text-sm font-medium text-gray-700 dark:text-white">
+            Email
+          </label>
+          <input
+            type="email"
+            value={session?.user?.email}
+            className="mt-1 block w-full outline-none cursor-not-allowed rounded-md p-2"
+            readOnly
+          />
+        </div>
         <div>
           <label className="block text-sm font-medium text-gray-700 dark:text-white">
             Name
@@ -179,30 +220,33 @@ export default function Account() {
           </div>
         </div>
 
-        <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-white">
-            Email
-          </label>
-          <input
-            type="email"
-            value={session?.user?.email}
-            className="mt-1 block w-full outline-none cursor-not-allowed rounded-md p-2"
-            readOnly
-          />
-        </div>
-
-        {handlePasswordfield == true ? (
+        {handlePasswordfield && (
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-white">
+            <label className="block text-red-500 text-sm font-medium ">
               Password
             </label>
-            <input
-              type="password"
-              placeholder="********"
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 p-2"
-            />
+            <div className="flex flex-row items-center space-x-3">
+              <input
+                type="password"
+                placeholder="********"
+                onChange={(e) => {
+                  setPasswordValue(e.target.value);
+                }}
+                readOnly={!isPasswordEditable}
+                className={`mt-1 block w-full p-2 ${
+                  isPasswordEditable
+                    ? "ring-1 dark:ring-gray-400 ring-gray-700 rounded-[4px]"
+                    : "outline-none"
+                }`}
+              />
+              {isPasswordEditable ? (
+                <CheckCheckIcon className="size-5" onClick={both2} />
+              ) : (
+                <Pen className="size-5" onClick={togglePasswordEdit} />
+              )}
+            </div>
           </div>
-        ) : null}
+        )}
       </div>
     </div>
   ) : null;
