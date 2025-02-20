@@ -18,6 +18,9 @@ export async function POST(req: NextRequest) {
     where: {
       userId: userId.id,
     },
+    orderBy: {
+      createdAt: "desc",
+    },
     include: { user: true },
   });
   return NextResponse.json(

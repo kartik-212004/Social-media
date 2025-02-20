@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 import React, { useState, useEffect, useRef } from "react";
-import { Pen, Camera, CheckCheckIcon, Divide } from "lucide-react";
+import { Pen, Camera, CheckCheckIcon } from "lucide-react";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useSession } from "next-auth/react";
@@ -157,10 +157,11 @@ export default function Account() {
             <DropdownMenuTrigger>
               <Avatar className="w-40 h-40">
                 <AvatarImage
-                  src={imagePreview || session?.user?.image}
+                  src={imagePreview ?? session?.user?.image ?? undefined}
                   className={isUploading ? "opacity-50" : ""}
                   alt="User Avatar"
                 />
+
                 <AvatarFallback className="bg-gray-100">
                   <Camera className="w-12 h-12 text-gray-400" />
                 </AvatarFallback>

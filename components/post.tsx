@@ -30,8 +30,8 @@ export default function Post({ on, onOpenChange }: PostProps) {
           email: data?.user?.email,
         });
 
-        setCaption(""); // Clear input
-        onOpenChange(); // Close modal
+        setCaption(""); 
+        onOpenChange(); 
       } catch (error) {
         console.error("Post failed:", error);
       } finally {
@@ -42,7 +42,7 @@ export default function Post({ on, onOpenChange }: PostProps) {
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === "Enter" && !e.shiftKey) {
-      e.preventDefault(); // Prevents new line
+      e.preventDefault(); 
       handlePost();
     }
   };
@@ -65,7 +65,7 @@ export default function Post({ on, onOpenChange }: PostProps) {
                 maxLength={280}
                 value={caption}
                 onChange={(e) => setCaption(e.target.value)}
-                onKeyDown={handleKeyDown} // Listen for Enter key
+                onKeyDown={handleKeyDown}
                 placeholder="Anything new"
                 className="w-full min-h-[30vh] dark:text-white text-black text-xl placeholder:text-xl bg-transparent dark:bg-background-dark focus:outline-none resize-none placeholder:text-muted-foreground"
               />

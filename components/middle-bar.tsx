@@ -3,7 +3,9 @@ import { Avatar, AvatarImage, AvatarFallback } from "./ui/avatar";
 import { Camera, Heart } from "lucide-react";
 import { useEffect, useRef, useState, useCallback } from "react";
 import { Skeleton } from "./ui/skeleton";
+import { useToast } from "@/hooks/use-toast";
 import axios from "axios";
+import { Trash2Icon } from "lucide-react";
 
 type Post = {
   id: string;
@@ -16,14 +18,21 @@ type Post = {
 };
 
 export default function Middlebar() {
+  const { toast } = useToast();
   const { data: session } = useSession();
   const textAreaRef = useRef<HTMLTextAreaElement>(null);
-  const [underLine, setunderLine] = useState(true);
   const [caption, setCaption] = useState("");
   const [fetchPost, setFetchPost] = useState<Post[]>([]);
   const [userpost, setUserPost] = useState<Post[]>([]);
   const [isPosting, setIsPosting] = useState(false);
   const [tabBar, setTabBar] = useState(true);
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      handlePost();
+    }
+  };
 
   const handleInput = useCallback(
     (e: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -52,7 +61,7 @@ export default function Middlebar() {
       const response = await axios.post("/api/myposts", {
         email: session?.user?.email,
       });
-      setUserPost(response.data.posts);
+      setUserPost(response.data.posts.reverse());
     } catch (error) {
       console.error("Fetch user posts failed:", error);
     }
@@ -76,6 +85,18 @@ export default function Middlebar() {
       }
     }
   }, [caption, session?.user?.email, fetchPosts]);
+
+  const DeletePost = async (id: string) => {
+    const response = await axios.post("/api/deletepost", {
+      email: session?.user?.email,
+      id: id,
+    });
+    const data = await response.data;
+    console.log(data);
+    toast({ title: data.message });
+    setUserPost((prevPosts) => prevPosts.filter((post) => post.id !== id));
+    setFetchPost((prevPosts) => prevPosts.filter((post) => post.id !== id));
+  };
 
   useEffect(() => {
     fetchPosts();
@@ -103,6 +124,14 @@ export default function Middlebar() {
         <div className="mt-2 flex items-center space-x-2">
           <Heart className="text-zinc-500 hover:text-red-500 cursor-pointer" />
           <span className="text-zinc-500">0</span>
+          {!tabBar && (
+            <span
+              onClick={() => DeletePost(post.id)}
+              className="text-zinc-500 hover:text-red-500 cursor-pointer"
+            >
+              <Trash2Icon />
+            </span>
+          )}
         </div>
       </div>
     </div>
@@ -159,6 +188,7 @@ export default function Middlebar() {
                   placeholder="What's happening?"
                   className="w-full bg-transparent placeholder:text-xl text-2xl resize-none overflow-hidden border-b-2 border-zinc-700 focus:outline-none p-2"
                   onChange={handleInput}
+                  onKeyDown={handleKeyDown}
                 />
               </div>
             </div>
