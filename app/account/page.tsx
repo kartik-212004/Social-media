@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 import React, { useState, useEffect, useRef } from "react";
-import { Pen, Camera, CheckCheckIcon } from "lucide-react";
+import { Pen, Camera, CheckCheckIcon, Divide } from "lucide-react";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useSession } from "next-auth/react";
@@ -23,6 +23,7 @@ export default function Account() {
   const [isUploading, setIsUploading] = useState(false);
   const [Passwordvalue, setPasswordValue] = useState("");
   const [isNameEditable, setIsNameEditable] = useState(false);
+  const [errorMessage, seterrorMessage] = useState(false);
   const [username, setUsername] = useState(session?.user?.name || "user");
   const [isPasswordEditable, setisPasswordEditable] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -76,6 +77,13 @@ export default function Account() {
     await update();
   }
   async function UpdatePassword() {
+    if (Passwordvalue.length <= 6) {
+      seterrorMessage(true);
+      setTimeout(() => {
+        seterrorMessage((value) => !value);
+      }, 5000);
+      return toast({ title: "Short Password Length" });
+    }
     try {
       const response = await axios.post("/api/minor/user/changepassword", {
         email: session?.user?.email,
@@ -108,7 +116,7 @@ export default function Account() {
     reader.readAsDataURL(file);
 
     try {
-      const response = await axios.post("/api/profile", {
+      await axios.post("/api/profile", {
         photo: imagePreview,
       });
     } catch (error) {
@@ -221,7 +229,7 @@ export default function Account() {
         </div>
 
         {handlePasswordfield && (
-          <div>
+          <div className="flex flex-col">
             <label className="block text-red-500 text-sm font-medium ">
               Password
             </label>
@@ -245,6 +253,11 @@ export default function Account() {
                 <Pen className="size-5" onClick={togglePasswordEdit} />
               )}
             </div>
+            {errorMessage && (
+              <div className="text-red-400 ">
+                Password Is Short : length &gt; 6
+              </div>
+            )}
           </div>
         )}
       </div>
