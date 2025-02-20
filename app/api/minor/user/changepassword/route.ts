@@ -1,8 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
+import bcrypt from "bcrypt";
+
 export async function POST(req: NextRequest) {
   const { email, password } = await req.json();
+  const hashedPassword = await bcrypt.hash(password, 10);
 
   try {
     await prisma.user.update({
@@ -10,7 +13,7 @@ export async function POST(req: NextRequest) {
         email: email,
       },
       data: {
-        password: password,
+        password: hashedPassword,
       },
     });
     return NextResponse.json(

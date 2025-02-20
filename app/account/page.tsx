@@ -19,7 +19,7 @@ import Sidebar from "@/components/left-sidebar";
 export default function Account() {
   const { data: session, status, update } = useSession();
   const { toast } = useToast();
-  const [handlePasswordfield, setHandlePasswordField] = useState(true);
+  const [handlePasswordfield, setHandlePasswordField] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [Passwordvalue, setPasswordValue] = useState("");
   const [isNameEditable, setIsNameEditable] = useState(false);
