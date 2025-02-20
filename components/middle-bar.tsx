@@ -18,7 +18,7 @@ type Post = {
 export default function Middlebar() {
   const { data: session } = useSession();
   const textAreaRef = useRef<HTMLTextAreaElement>(null);
-
+  const [underLine, setunderLine] = useState(true);
   const [caption, setCaption] = useState("");
   const [fetchPost, setFetchPost] = useState<Post[]>([]);
   const [userpost, setUserPost] = useState<Post[]>([]);
@@ -110,17 +110,25 @@ export default function Middlebar() {
 
   return (
     <div className="border-x-2 min-h-screen dark:border-zinc-800 w-1/2 relative">
-      <div className="sticky top-0 z-50 bg-white dark:bg-[#121212]">
+      <div className="sticky top-0 z-50 dark:bg-darktheme bg-white  ">
         <div className="flex border-y-2 dark:border-zinc-800 flex-row w-full">
           <button
             onClick={() => setTabBar(true)}
-            className="w-1/2 dark:hover:bg-zinc-900 hover:bg-zinc-100 py-4"
+            className={`w-1/2 py-4 text-lg font-semibold  transition-all duration-200 ${
+              tabBar
+                ? "border-b-2 border-blue-500 "
+                : "dark:border-[#121212] border-white border-b-2"
+            }`}
           >
             For you
           </button>
           <button
             onClick={() => setTabBar(false)}
-            className="w-1/2 dark:hover:bg-zinc-900 hover:bg-zinc-100 py-4"
+            className={`w-1/2 py-4 text-lg font-semibold  transition-all duration-200 ${
+              tabBar
+                ? "dark:border-[#121212] border-white border-b-2 "
+                : "border-b-2 border-blue-500 "
+            }`}
           >
             My Posts
           </button>

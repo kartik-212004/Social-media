@@ -3,7 +3,6 @@ import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 export async function POST(req: NextRequest) {
   const body = await req.json();
-  console.log(body);
   const { email } = await body;
 
   if (!email) return NextResponse.json({ message: "no email found" });

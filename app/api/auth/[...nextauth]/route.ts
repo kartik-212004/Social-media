@@ -52,7 +52,7 @@ const handler = NextAuth({
           }
 
           return {
-            id: user.id, // ✅ Include user ID
+            id: user.id,
             email: user.email,
             name: user.name,
             image: user.image || null,
@@ -82,7 +82,7 @@ const handler = NextAuth({
             data: {
               email: user.email,
               name: user.name,
-              password: null, // ✅ OAuth users don't have passwords
+              password: null,
             },
           });
         }
@@ -93,6 +93,7 @@ const handler = NextAuth({
     async session({ session, token }) {
       if (session?.user) {
         session.user.id = token.id;
+        session.user.provider = token.provider;
         session.user.image =
           session.user.image ??
           "https://th.bing.com/th/id/OIP.S171c9HYsokHyCPs9brbPwHaGP?rs=1&pid=ImgDetMain";
@@ -103,6 +104,7 @@ const handler = NextAuth({
     async jwt({ token, user }) {
       if (user) {
         token.id = user.id;
+        token.provider = account?.provider || "credentials";
       }
       return token;
     },

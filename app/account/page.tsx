@@ -17,6 +17,7 @@ import Sidebar from "@/components/left-sidebar";
 
 export default function Account() {
   const { data: session, status, update } = useSession();
+  const [handlePasswordfield, setHandlePasswordField] = useState(true);
   const [isUploading, setIsUploading] = useState(false);
   const [isNameEditable, setIsNameEditable] = useState(false);
   const [username, setUsername] = useState(session?.user?.name || "user");
@@ -24,6 +25,30 @@ export default function Account() {
   const [imagePreview, setImagePreview] = useState(
     session?.user?.image || null
   );
+
+  useEffect(() => {
+    async function fetchUser() {
+      if (!session?.user?.email) return;
+
+      try {
+        const response = await axios.post("/api/minor/user", {
+          email: session.user.email,
+        });
+
+        if (response.data?.find) {
+          setHandlePasswordField(true);
+          console.log(handlePasswordfield);
+        } else {
+          setHandlePasswordField(false);
+        }
+      } catch (error) {
+        console.log("Error fetching user:", error);
+      }
+    }
+
+    fetchUser();
+  }, [session?.user?.email]);
+
   function both() {
     toggleNameEdit();
     RequesttoUpdateName();
@@ -82,7 +107,7 @@ export default function Account() {
     );
   }
 
-  return (
+  return session?.user?.email ? (
     <div className="container mx-auto flex flex-row">
       <Sidebar />
       <div className="flex w-[83.33%] dark:border-zinc-800 border-l-2 min-h-screen p-16 space-y-4 relative flex-col">
@@ -166,17 +191,19 @@ export default function Account() {
           />
         </div>
 
-        <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-white">
-            Password
-          </label>
-          <input
-            type="password"
-            placeholder="********"
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 p-2"
-          />
-        </div>
+        {handlePasswordfield == true ? (
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-white">
+              Password
+            </label>
+            <input
+              type="password"
+              placeholder="********"
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 p-2"
+            />
+          </div>
+        ) : null}
       </div>
     </div>
-  );
+  ) : null;
 }

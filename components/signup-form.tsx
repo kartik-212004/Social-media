@@ -1,12 +1,11 @@
 "use client";
-import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { useToast } from "@/hooks/use-toast";
 import { Label } from "@/components/ui/label";
 import { Github } from "lucide-react";
-import { useTheme } from "next-themes";
 import { Globe } from "lucide-react";
 import { signIn } from "next-auth/react";
 
@@ -18,17 +17,17 @@ export function SignUpForm({
   className,
   ...props
 }: React.ComponentPropsWithoutRef<"form">) {
-  const { theme } = useTheme();
+  const { toast } = useToast();
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setname] = useState("");
 
   function errorToast(e: string) {
-    toast.error(e);
+    toast({ title: e });
   }
   function successToast(e: string) {
-    toast.success(e);
+    toast({ title: e });
   }
 
   async function loginHandler(e: React.FormEvent) {
@@ -40,7 +39,7 @@ export function SignUpForm({
         name: name,
       });
       if (handle.status === 200) successToast(handle.data.message);
-      router.push("/");
+      router.push("/signin");
     } catch (error) {
       if (error instanceof AxiosError) {
         const { response } = error;
@@ -72,7 +71,7 @@ export function SignUpForm({
       className={cn("flex flex-col gap-6", className)}
       {...props}
     >
-      <ToastContainer theme={theme} />
+      {/* <ToastContainer theme={theme} /> */}
       <div className="flex flex-col items-center gap-2 text-center">
         <h1 className="text-2xl font-bold">Create your account</h1>
         <p className="text-balance text-sm text-neutral-500 dark:text-neutral-400">

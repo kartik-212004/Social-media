@@ -1,5 +1,5 @@
 "use client";
-
+import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -14,6 +14,7 @@ export function LoginForm({
   className,
   ...props
 }: React.ComponentPropsWithoutRef<"form">) {
+  const { toast } = useToast();
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -26,7 +27,11 @@ export function LoginForm({
       password: password,
     });
     if (handle?.ok) {
+      toast({ title: "Successfully Logged In" });
       router.push("/");
+    } else {
+      toast({ title: "User Already Exists" });
+      console.log(handle);
     }
   }
   async function githubHandle(e: React.FormEvent) {

@@ -30,23 +30,24 @@ const sidebarData = [
 ];
 
 import { useRouter } from "next/navigation";
+import { useToast } from "@/hooks/use-toast";
 import { useTheme } from "next-themes";
 import { useSession, signOut } from "next-auth/react";
 import { Button } from "./ui/button";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import axios from "axios";
 import Post from "./post";
 import { Skeleton } from "./ui/skeleton";
 
 export default function Sidebar() {
+  const { toast } = useToast();
   const Router = useRouter();
   const [toggle, setToggle] = useState(false);
   const [caption, setCaption] = useState("");
   const { data, status } = useSession();
   const [isPosting, setIsPosting] = useState(false);
   const { theme, setTheme } = useTheme();
-  console.log(data?.user?.image);
 
   function handleOnclick() {
     handlePost();
@@ -136,6 +137,7 @@ export default function Sidebar() {
             <DropdownMenuItem
               onClick={() => {
                 signOut({ callbackUrl: "/signin" });
+                toast({ title: "Logged Out" });
               }}
               className="flex text-red-600  flex-row"
             >
