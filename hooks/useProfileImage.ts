@@ -1,6 +1,6 @@
-// hooks/useProfileImage.ts
 import { useState, useEffect } from "react";
 import axios, { AxiosError } from "axios";
+import useFetchUserPassword from "./check-password";
 import { useSession } from "next-auth/react";
 
 export const useProfileImage = () => {
@@ -8,15 +8,20 @@ export const useProfileImage = () => {
   const [imageUrl, setImageUrl] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
+  const hasPassword = useFetchUserPassword();
 
   const fetchImage = async () => {
-    if (!session?.user?.email) return;
+    if (!session?.user?.email || hasPassword === null) return;
+
+    if (!hasPassword && session?.user?.image) {
+      setImageUrl(session.user.image);
+      return;
+    }
 
     setIsLoading(true);
     setError(null);
 
     try {
-      // First try to get image from S3
       const response = await axios.post("/api/s3/get", {
         email: session.user.email,
       });
@@ -27,15 +32,10 @@ export const useProfileImage = () => {
       }
     } catch (err) {
       const error = err as AxiosError;
-      
-      // If no S3 image found, check for OAuth provider image
+
       if (error.response?.status === 404) {
-        if (session.user.image) {
-          setImageUrl(session.user.image);
-          return;
-        }
-        // If no provider image, use default
-        setImageUrl("/default-avatar.png");
+        setImageUrl(session.user.image ?? "/default-avatar.png");
+        return;
       } else {
         console.error("Error fetching image:", error);
       }
@@ -45,8 +45,10 @@ export const useProfileImage = () => {
   };
 
   useEffect(() => {
-    fetchImage();
-  }, [session?.user?.email]);
+    if (hasPassword !== null) {
+      fetchImage();
+    }
+  }, [session?.user?.email, hasPassword]);
 
   return {
     imageUrl,

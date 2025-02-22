@@ -33,7 +33,7 @@ export default function Account() {
   const [username, setUsername] = useState(session?.user?.name || "user");
   const [isPasswordEditable, setIsPasswordEditable] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const { imageUrl: profileImageUrl, isLoading: isImageLoading, refetchImage } = useProfileImage();
+  const { imageUrl: profileImageUrl, refetchImage } = useProfileImage();
   const hasPassword = useFetchUserPassword();
 
   useEffect(() => {
@@ -132,7 +132,7 @@ export default function Account() {
       toast({
         title: data.message,
       });
-      
+
       await refetchImage();
     } catch (error) {
       console.error("Error removing image:", error);

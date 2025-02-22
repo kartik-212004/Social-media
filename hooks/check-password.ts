@@ -4,7 +4,9 @@ import { useSession } from "next-auth/react";
 
 const useFetchUserPassword = () => {
   const { data: session } = useSession();
-  const [handlePasswordField, setHandlePasswordField] = useState(false);
+  const [handlePasswordField, setHandlePasswordField] = useState<
+    boolean | null
+  >(null); 
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -15,18 +17,15 @@ const useFetchUserPassword = () => {
           email: session.user.email,
         });
 
-        if (response.data?.find) {
-          setHandlePasswordField(true);
-        } else {
-          setHandlePasswordField(false);
-        }
+        setHandlePasswordField(response.data?.find ?? false); 
       } catch (error) {
         console.log("Error fetching user:", error);
+        setHandlePasswordField(false);
       }
     };
 
     fetchUser();
-  }, [session]);
+  }, [session?.user?.email]);
 
   return handlePasswordField;
 };
