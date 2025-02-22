@@ -16,24 +16,31 @@ export const useProfileImage = () => {
     setError(null);
 
     try {
+      // First try to get image from S3
       const response = await axios.post("/api/s3/get", {
-        email: session?.user?.email,
+        email: session.user.email,
       });
 
       if (response.status === 200 && response.data.imageUrl) {
         setImageUrl(response.data.imageUrl);
-      } else {
-        throw new Error("Image not found");
+        return;
       }
     } catch (err) {
       const error = err as AxiosError;
-
+      
+      // If no S3 image found, check for OAuth provider image
       if (error.response?.status === 404) {
-        console.warn("No profile image found, using default.");
+        if (session.user.image) {
+          setImageUrl(session.user.image);
+          return;
+        }
+        // If no provider image, use default
         setImageUrl("/default-avatar.png");
       } else {
         console.error("Error fetching image:", error);
       }
+    } finally {
+      setIsLoading(false);
     }
   };
 

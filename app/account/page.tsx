@@ -17,6 +17,8 @@ import { useSession } from "next-auth/react";
 import axios, { AxiosError } from "axios";
 import { useToast } from "@/hooks/use-toast";
 import Sidebar from "@/components/left-sidebar";
+import { useProfileImage } from "@/hooks/useProfileImage";
+import useFetchUserPassword from "@/hooks/check-password";
 
 export default function Account() {
   const { data: session, status, update } = useSession();
@@ -31,6 +33,8 @@ export default function Account() {
   const [username, setUsername] = useState(session?.user?.name || "user");
   const [isPasswordEditable, setIsPasswordEditable] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const { imageUrl: profileImageUrl, isLoading: isImageLoading, refetchImage } = useProfileImage();
+  const hasPassword = useFetchUserPassword();
 
   useEffect(() => {
     if (session?.user?.email) {
@@ -108,7 +112,7 @@ export default function Account() {
         title: response.data.message,
       });
 
-      await handleGetImage();
+      await refetchImage();
     } catch (error) {
       console.error("Error uploading image:", error);
       toast({
@@ -128,7 +132,8 @@ export default function Account() {
       toast({
         title: data.message,
       });
-      setImageUrl("");
+      
+      await refetchImage();
     } catch (error) {
       console.error("Error removing image:", error);
     }
@@ -232,7 +237,7 @@ export default function Account() {
             >
               <div className="w-60 h-60 overflow-hidden rounded-full">
                 <img
-                  src={imageUrl}
+                  src={profileImageUrl}
                   className="w-full h-full object-cover"
                   alt="User Avatar"
                 />
@@ -244,7 +249,7 @@ export default function Account() {
             <DropdownMenuTrigger>
               <Avatar className="w-40 h-40">
                 <AvatarImage
-                  src={imageUrl}
+                  src={profileImageUrl}
                   className={isUploading ? "opacity-50" : "object-cover"}
                   alt="User Avatar"
                 />
@@ -259,7 +264,7 @@ export default function Account() {
                 View Photo
               </DropdownMenuItem>
 
-              {handlePasswordfield && (
+              {hasPassword && (
                 <>
                   <DropdownMenuItem
                     onClick={() => {
