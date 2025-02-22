@@ -186,7 +186,7 @@ export default function Account() {
     );
   }
 
-  return session?.user?.email ? (
+  return session?.user?.email && imageUrl ? (
     <div className="container mx-auto flex flex-row">
       <Sidebar />
       <div className="flex w-[83.33%] dark:border-zinc-800 border-l-2 min-h-screen p-16 space-y-4 relative flex-col">
@@ -197,7 +197,12 @@ export default function Account() {
             open={handleImagePreview}
             onOpenChange={setHandleImagePreview}
           >
-            <DialogContent className="p-0 bg-transparent border-none shadow-none flex justify-center items-center">
+            <DialogContent
+              className="p-0 bg-transparent border-none shadow-none flex justify-center items-center"
+              style={{
+                backgroundColor: "transparent",
+              }}
+            >
               <div className="w-60 h-60 overflow-hidden rounded-full">
                 <img
                   src={imageUrl}
@@ -212,7 +217,7 @@ export default function Account() {
             <DropdownMenuTrigger>
               <Avatar className="w-40 h-40">
                 <AvatarImage
-                  src={imageUrl || session?.user?.image}
+                  src={imageUrl}
                   className={isUploading ? "opacity-50" : "object-cover"}
                   alt="User Avatar"
                 />

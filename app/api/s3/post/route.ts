@@ -20,12 +20,10 @@ export async function POST(request: NextRequest) {
   const bytes = await file.arrayBuffer();
   const buffer = Buffer.from(bytes);
 
-  const fileName = crypto.createHash("sha256").update(file.name).digest("hex");
-
   await s3Client.send(
     new PutObjectCommand({
       Bucket: process.env.BUCKET_NAME,
-      Key: fileName,
+      Key: email,
       Body: buffer,
       ContentType: file.type,
     })
@@ -35,7 +33,7 @@ export async function POST(request: NextRequest) {
       email: email,
     },
     data: {
-      imageName: fileName,
+      imageName: email,
     },
   });
 

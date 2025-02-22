@@ -33,7 +33,6 @@ export async function POST(req: NextRequest) {
     const signedUrl = await getSignedUrl(s3Client, command, {
       expiresIn: 3600,
     });
-    console.log(signedUrl);
 
     return NextResponse.json({ imageUrl: signedUrl });
   } catch (error) {
