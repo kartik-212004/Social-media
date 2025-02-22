@@ -5,6 +5,7 @@ import { useEffect, useRef, useState, useCallback } from "react";
 import { Skeleton } from "./ui/skeleton";
 import { useToast } from "@/hooks/use-toast";
 import axios from "axios";
+import { Input } from "./ui/input";
 import { Trash2Icon } from "lucide-react";
 import { useProfileImage } from "@/hooks/useProfileImage";
 
@@ -19,13 +20,14 @@ type Post = {
 };
 
 export default function Middlebar() {
-  const { imageUrl, refetchImage } = useProfileImage();
+  const { imageUrl } = useProfileImage();
   const { toast } = useToast();
   const { data: session } = useSession();
   const textAreaRef = useRef<HTMLTextAreaElement>(null);
   const [caption, setCaption] = useState("");
   const [fetchPost, setFetchPost] = useState<Post[]>([]);
   const [userpost, setUserPost] = useState<Post[]>([]);
+  const [file, setFile] = useState<File>();
   const [isPosting, setIsPosting] = useState(false);
   const [tabBar, setTabBar] = useState(true);
 
@@ -192,8 +194,14 @@ export default function Middlebar() {
                 />
               </div>
             </div>
-            <div className="flex w-full justify-end">
-              <input type="file" name="" id="" />
+            <div className="flex w-full space-x-4 justify-end">
+              <Input
+                onChange={(e) => {
+                  setFile(e.target.files?.[0]);
+                }}
+                type="file"
+                className="py-2 w-[35%] text-blue-400  px-5 rounded-3xl font-medium "
+              />
               <button
                 onClick={handlePost}
                 disabled={!caption.trim() || isPosting}
