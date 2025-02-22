@@ -71,11 +71,6 @@ export default function Sidebar() {
     }
   }
 
-  // useEffect(() => {
-  //   if (status == "unauthenticated") {
-  //     Router.push("/signin");
-  //   }
-  // }, [status, Router]);
   return status == "loading" ? (
     <div className="flex justify-center items-center w-screen h-screen">
       {" "}

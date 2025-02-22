@@ -7,6 +7,11 @@ import {
   DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
 
+import {
+  Dialog,
+  DialogContent,
+} from "@/components/ui/dialog";
+
 import React, { useState, useEffect, useRef } from "react";
 import { Pen, Camera, CheckCheckIcon } from "lucide-react";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
@@ -20,6 +25,7 @@ export default function Account() {
   const { data: session, status, update } = useSession();
   const { toast } = useToast();
   const [handlePasswordfield, setHandlePasswordField] = useState(false);
+  const [handleImagePreview, sethandleImagePreview] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [Passwordvalue, setPasswordValue] = useState("");
   const [isNameEditable, setIsNameEditable] = useState(false);
@@ -77,7 +83,12 @@ export default function Account() {
     await update();
   }
   async function UpdatePassword() {
+    if (Passwordvalue.length <= 0) {
+      setPasswordValue("");
+      return;
+    }
     if (Passwordvalue.length <= 6) {
+      setPasswordValue("");
       seterrorMessage(true);
       setTimeout(() => {
         seterrorMessage((value) => !value);
@@ -90,6 +101,7 @@ export default function Account() {
         password: Passwordvalue,
       });
       const UpdatedPassword = await response.data;
+      setPasswordValue("");
       if (UpdatedPassword.status) {
         toast({
           title: UpdatedPassword.message,
@@ -109,16 +121,18 @@ export default function Account() {
   ) => {
     const file = event.target.files?.[0];
     if (!file) return;
-
     setIsUploading(true);
     const reader = new FileReader();
-    reader.onloadend = () => setImagePreview(reader.result as string);
+
+    reader.onloadend = async () => setImagePreview(reader.result as string);
+    const formData = new FormData();
+    formData.append("file", file);
+    console.log(imagePreview, "photo");
     reader.readAsDataURL(file);
 
     try {
-      await axios.post("/api/profile", {
-        photo: imagePreview,
-      });
+      const response = await axios.post("/api/s3/post", formData);
+      console.log(response.data);
     } catch (error) {
       console.error("Error uploading image:", error);
     } finally {
@@ -153,12 +167,32 @@ export default function Account() {
         <h1 className="text-3xl">Account Settings</h1>
 
         <div className="flex space-x-8 flex-row items-start">
+          <Dialog
+            open={handleImagePreview}
+            onOpenChange={sethandleImagePreview}
+          >
+            <DialogContent
+              className="p-0 bg-transparent border-none shadow-none flex justify-center items-center"
+              style={{
+                backgroundColor: "transparent",
+              }}
+            >
+              <div className="w-60 h-60 overflow-hidden rounded-full">
+                <img
+                  src={imagePreview ?? session?.user?.image ?? undefined}
+                  className="w-full h-full object-cover"
+                  alt="User Avatar"
+                />
+              </div>
+            </DialogContent>
+          </Dialog>
+
           <DropdownMenu>
             <DropdownMenuTrigger>
               <Avatar className="w-40 h-40">
                 <AvatarImage
                   src={imagePreview ?? session?.user?.image ?? undefined}
-                  className={isUploading ? "opacity-50" : ""}
+                  className={isUploading ? "opacity-50" : "object-cover"}
                   alt="User Avatar"
                 />
 
@@ -169,13 +203,24 @@ export default function Account() {
             </DropdownMenuTrigger>
 
             <DropdownMenuContent>
-              <DropdownMenuItem>View Photo</DropdownMenuItem>
-              <DropdownMenuItem onClick={removeImage}>Delete</DropdownMenuItem>
-              <DropdownMenuItem>
-                <label htmlFor="fileInput" className="cursor-pointer">
-                  Change Photo
-                </label>
+              <DropdownMenuItem
+                onClick={() => sethandleImagePreview((prev) => !prev)}
+              >
+                View Photo
               </DropdownMenuItem>
+
+              {handlePasswordfield && (
+                <>
+                  <DropdownMenuItem onClick={removeImage}>
+                    Delete
+                  </DropdownMenuItem>
+                  <DropdownMenuItem>
+                    <label htmlFor="fileInput" className="cursor-pointer">
+                      Change Photo
+                    </label>
+                  </DropdownMenuItem>
+                </>
+              )}
             </DropdownMenuContent>
           </DropdownMenu>
 
@@ -241,6 +286,7 @@ export default function Account() {
                 onChange={(e) => {
                   setPasswordValue(e.target.value);
                 }}
+                value={Passwordvalue}
                 readOnly={!isPasswordEditable}
                 className={`mt-1 block w-full p-2 ${
                   isPasswordEditable
