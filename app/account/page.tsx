@@ -140,6 +140,10 @@ export default function Account() {
   };
 
   const handleNameUpdate = async () => {
+    if (username == session?.user?.name) {
+      setIsNameEditable(false);
+      return toast({ title: "Please Enter A New Name" });
+    }
     try {
       await axios.post("/api/userdata", {
         name: username,
@@ -303,25 +307,28 @@ export default function Account() {
           <label className="block text-sm font-medium text-gray-700 dark:text-white">
             Email
           </label>
-          <input
-            type="email"
-            value={session?.user?.email}
-            className="mt-1 block w-full outline-none cursor-not-allowed rounded-md p-2"
-            readOnly
-          />
+          <div className="flex flex-row items-center space-x-3 rounded-lg">
+            <input
+              type="email"
+              value={session?.user?.email}
+              className="mt-1 block w-full outline-none cursor-not-allowed rounded-xl p-2"
+              readOnly
+            />{" "}
+            <div className="size-5"></div>
+          </div>
         </div>
 
         <div>
           <label className="block text-sm font-medium text-gray-700 dark:text-white">
             Name
           </label>
-          <div className="flex flex-row items-center space-x-3">
+          <div className="flex flex-row items-center space-x-3 rounded-lg">
             <input
               onChange={(e) => setUsername(e.target.value)}
               readOnly={!isNameEditable}
               type="text"
               value={username}
-              className={`mt-1 block w-full p-2 ${
+              className={`mt-1  block w-full  p-2 rounded-xl   ${
                 isNameEditable
                   ? "ring-1 dark:ring-gray-400 ring-gray-700 rounded-[4px]"
                   : "outline-none"
@@ -340,14 +347,14 @@ export default function Account() {
             <label className="block text-red-500 text-sm font-medium">
               Password
             </label>
-            <div className="flex flex-row items-center space-x-3">
+            <div className="flex flex-row items-center space-x-3 rounded-lg">
               <input
                 type="password"
                 placeholder="********"
                 onChange={(e) => setPasswordValue(e.target.value)}
                 value={passwordValue}
                 readOnly={!isPasswordEditable}
-                className={`mt-1 block w-full p-2 ${
+                className={`mt-1  block w-full p-2  rounded-xl ${
                   isPasswordEditable
                     ? "ring-1 dark:ring-gray-400 ring-gray-700 rounded-[4px]"
                     : "outline-none"

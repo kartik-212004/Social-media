@@ -6,6 +6,7 @@ import { Skeleton } from "./ui/skeleton";
 import { useToast } from "@/hooks/use-toast";
 import axios from "axios";
 import { Trash2Icon } from "lucide-react";
+import { useProfileImage } from "@/hooks/useProfileImage";
 
 type Post = {
   id: string;
@@ -18,6 +19,7 @@ type Post = {
 };
 
 export default function Middlebar() {
+  const { imageUrl, refetchImage } = useProfileImage();
   const { toast } = useToast();
   const { data: session } = useSession();
   const textAreaRef = useRef<HTMLTextAreaElement>(null);
@@ -120,6 +122,7 @@ export default function Middlebar() {
             {new Date(post.createdAt).toLocaleString()}
           </span>
         </div>
+        <img className="pr-10" src={imageUrl} alt="awdawd" />
         <p className="mt-2">{post.Caption}</p>
         <div className="mt-2 flex items-center space-x-2">
           <Heart className="text-zinc-500 hover:text-red-500 cursor-pointer" />
@@ -170,10 +173,7 @@ export default function Middlebar() {
             <div className="Post py-2 flex flex-row items-start">
               <div className="mx-2">
                 <Avatar>
-                  <AvatarImage
-                    src={session?.user?.image || ""}
-                    alt="User Avatar"
-                  />
+                  <AvatarImage src={imageUrl || ""} alt="User Avatar" />
                   <AvatarFallback>
                     <Camera />
                   </AvatarFallback>
@@ -193,6 +193,7 @@ export default function Middlebar() {
               </div>
             </div>
             <div className="flex w-full justify-end">
+              <input type="file" name="" id="" />
               <button
                 onClick={handlePost}
                 disabled={!caption.trim() || isPosting}

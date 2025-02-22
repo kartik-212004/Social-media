@@ -12,7 +12,7 @@ export default {
       colors: {
         background: "var(--background)",
         foreground: "var(--foreground)",
-        darktheme: "#121212",
+        darktheme: "#09090b",
       },
       borderRadius: {
         lg: "var(--radius)",
