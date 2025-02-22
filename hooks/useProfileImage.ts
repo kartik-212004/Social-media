@@ -1,6 +1,6 @@
 // hooks/useProfileImage.ts
 import { useState, useEffect } from "react";
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 import { useSession } from "next-auth/react";
 
 export const useProfileImage = () => {
@@ -17,14 +17,23 @@ export const useProfileImage = () => {
 
     try {
       const response = await axios.post("/api/s3/get", {
-        email: session.user.email,
+        email: session?.user?.email,
       });
-      setImageUrl(response.data.imageUrl);
-    } catch (error) {
-      console.error("Error fetching profile image:", error);
-      setError("Failed to load profile image");
-    } finally {
-      setIsLoading(false);
+
+      if (response.status === 200 && response.data.imageUrl) {
+        setImageUrl(response.data.imageUrl);
+      } else {
+        throw new Error("Image not found");
+      }
+    } catch (err) {
+      const error = err as AxiosError;
+
+      if (error.response?.status === 404) {
+        console.warn("No profile image found, using default.");
+        setImageUrl("/default-avatar.png");
+      } else {
+        console.error("Error fetching image:", error);
+      }
     }
   };
 

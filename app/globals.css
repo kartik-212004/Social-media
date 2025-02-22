@@ -17,3 +17,7 @@
   color: var(--foreground);
   transition: background-color 0.3s ease;
 } */
+
+
+
+@layer base {}

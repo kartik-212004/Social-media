@@ -29,6 +29,7 @@ const sidebarData = [
   ,
 ];
 
+import noProfile from "../public/image.png";
 import { useToast } from "@/hooks/use-toast";
 import { useTheme } from "next-themes";
 import { useProfileImage } from "@/hooks/useProfileImage";
@@ -116,7 +117,7 @@ export default function Sidebar() {
                   width={40}
                   height={40}
                   className="w-10 h-10 rounded-full"
-                  src={imageUrl || "/public/image.png"}
+                  src={imageUrl || noProfile}
                   alt="Profile"
                 />
                 <div className="flex flex-col items-start ">

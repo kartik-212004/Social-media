@@ -22,7 +22,7 @@ export async function POST(req: NextRequest) {
     });
 
     if (!user || !user.imageName) {
-      return NextResponse.json({ error: "Image not found" }, { status: 404 });
+      return NextResponse.json({ message: "Image not found" }, { status: 404 });
     }
 
     const command = new GetObjectCommand({
@@ -38,7 +38,7 @@ export async function POST(req: NextRequest) {
   } catch (error) {
     console.error("Error fetching image:", error);
     return NextResponse.json(
-      { error: "Internal server error" },
+      { message: "Internal server error" },
       { status: 500 }
     );
   } finally {

@@ -6,13 +6,15 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
+
+import Particles from "@/components/ui/Particles";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import React, { useState, useEffect, useRef } from "react";
 import { Pen, Camera, CheckCheckIcon } from "lucide-react";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useSession } from "next-auth/react";
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 import { useToast } from "@/hooks/use-toast";
 import Sidebar from "@/components/left-sidebar";
 
@@ -65,9 +67,24 @@ export default function Account() {
       const response = await axios.post("/api/s3/get", {
         email: session?.user?.email,
       });
-      setImageUrl(response.data.imageUrl);
-    } catch (error) {
-      console.error("Error fetching image:", error);
+
+      if (response.status === 200 && response.data.imageUrl) {
+        setImageUrl(response.data.imageUrl);
+        toast({ title: "Image loaded successfully" });
+      } else {
+        throw new Error("Image not found");
+      }
+    } catch (err) {
+      const error = err as AxiosError;
+
+      if (error.response?.status === 404) {
+        console.warn("No profile image found, using default.");
+        setImageUrl("/default-avatar.png");
+        toast({ title: "No profile image found. Using default." });
+      } else {
+        console.error("Error fetching image:", error);
+        toast({ title: "Error fetching image", variant: "destructive" });
+      }
     }
   };
 
@@ -104,7 +121,6 @@ export default function Account() {
 
   const removeImage = async () => {
     try {
-      // Add API call to remove image
       await axios.post("/api/s3/delete", {
         email: session?.user?.email,
       });
@@ -142,8 +158,10 @@ export default function Account() {
   };
 
   const handlePasswordUpdate = async () => {
+    setIsPasswordEditable((e) => !e);
     if (!passwordValue) {
       setPasswordValue("");
+
       return;
     }
 
@@ -190,6 +208,18 @@ export default function Account() {
     <div className="container mx-auto flex flex-row">
       <Sidebar />
       <div className="flex w-[83.33%] dark:border-zinc-800 border-l-2 min-h-screen p-16 space-y-4 relative flex-col">
+        <div className="absolute inset-0 -z-10">
+          <Particles
+            particleColors={["#ffffff", "#ffffff"]}
+            particleCount={200}
+            particleSpread={10}
+            speed={0.1}
+            particleBaseSize={100}
+            moveParticlesOnHover={true}
+            alphaParticles={false}
+            disableRotation={false}
+          />
+        </div>
         <h1 className="text-3xl">Account Settings</h1>
 
         <div className="flex space-x-8 flex-row items-start">
