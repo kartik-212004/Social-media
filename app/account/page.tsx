@@ -206,7 +206,7 @@ export default function Account() {
     );
   }
 
-  return session?.user?.email ? (
+  return session?.user?.email && imageUrl ? (
     <div className="container mx-auto flex flex-row">
       <Sidebar />
       <div className="flex w-[83.33%] dark:border-zinc-800 border-l-2 min-h-screen p-16 space-y-4 relative flex-col">
