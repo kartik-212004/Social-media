@@ -6,9 +6,11 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+
+import { useProfileImage } from "@/hooks/useProfileImage";
 import { Button } from "./ui/button";
 import { useSession } from "next-auth/react";
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import axios from "axios";
 
 interface PostProps {
@@ -20,6 +22,11 @@ export default function Post({ on, onOpenChange }: PostProps) {
   const { data } = useSession();
   const [caption, setCaption] = useState("");
   const [isPosting, setIsPosting] = useState(false);
+  const { imageUrl, refetchImage } = useProfileImage();
+
+  useEffect(() => {
+    refetchImage();
+  }, []);
 
   const handlePost = useCallback(async () => {
     if (caption.trim() && !isPosting) {
@@ -30,8 +37,8 @@ export default function Post({ on, onOpenChange }: PostProps) {
           email: data?.user?.email,
         });
 
-        setCaption(""); 
-        onOpenChange(); 
+        setCaption("");
+        onOpenChange();
       } catch (error) {
         console.error("Post failed:", error);
       } finally {
@@ -42,10 +49,11 @@ export default function Post({ on, onOpenChange }: PostProps) {
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === "Enter" && !e.shiftKey) {
-      e.preventDefault(); 
+      e.preventDefault();
       handlePost();
     }
   };
+
 
   return (
     <Dialog open={on} onOpenChange={onOpenChange}>
@@ -53,7 +61,7 @@ export default function Post({ on, onOpenChange }: PostProps) {
         <DialogHeader className="flex flex-row items-start space-x-4">
           <div className="w-[10%]">
             <img
-              src={data?.user?.image || "/default-avatar.png"}
+              src={imageUrl || "/default-avatar.png"}
               alt="Profile"
               className="w-10 h-10 rounded-full"
             />
