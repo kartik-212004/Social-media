@@ -37,6 +37,7 @@ export default function Account() {
       handleGetImage();
     }
   }, [session?.user?.email]);
+  useEffect(() => {}, [imageUrl]);
 
   useEffect(() => {
     async function fetchUser() {
@@ -119,21 +120,17 @@ export default function Account() {
     }
   };
 
-  const removeImage = async () => {
+  const removeImage = async (email: string) => {
     try {
-      await axios.post("/api/s3/delete", {
-        email: session?.user?.email,
+      const response = await axios.delete(`/api/s3/delete/${email}`);
+      const data = await response.data;
+
+      toast({
+        title: data.message,
       });
       setImageUrl("");
-      toast({
-        title: "Image removed successfully",
-      });
     } catch (error) {
       console.error("Error removing image:", error);
-      toast({
-        title: "Error removing image",
-        variant: "destructive",
-      });
     }
   };
 
@@ -204,7 +201,7 @@ export default function Account() {
     );
   }
 
-  return session?.user?.email && imageUrl ? (
+  return session?.user?.email ? (
     <div className="container mx-auto flex flex-row">
       <Sidebar />
       <div className="flex w-[83.33%] dark:border-zinc-800 border-l-2 min-h-screen p-16 space-y-4 relative flex-col">
@@ -264,7 +261,11 @@ export default function Account() {
 
               {handlePasswordfield && (
                 <>
-                  <DropdownMenuItem onClick={removeImage}>
+                  <DropdownMenuItem
+                    onClick={() => {
+                      removeImage(session.user?.email || "");
+                    }}
+                  >
                     Delete
                   </DropdownMenuItem>
                   <DropdownMenuItem>

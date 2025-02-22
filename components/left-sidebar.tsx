@@ -116,7 +116,7 @@ export default function Sidebar() {
                 <img
                   width={40}
                   height={40}
-                  className="w-10 h-10 rounded-full"
+                  className="w-10 h-10 object-cover rounded-full"
                   src={imageUrl || noProfile}
                   alt="Profile"
                 />
