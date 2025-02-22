@@ -31,6 +31,7 @@ const sidebarData = [
 
 import { useToast } from "@/hooks/use-toast";
 import { useTheme } from "next-themes";
+import { useProfileImage } from "@/hooks/useProfileImage";
 import { useSession, signOut } from "next-auth/react";
 import { Button } from "./ui/button";
 import Link from "next/link";
@@ -41,7 +42,7 @@ import { Skeleton } from "./ui/skeleton";
 
 export default function Sidebar() {
   const { toast } = useToast();
-  const [setImage, setImageUrl] = useState("");
+  const { imageUrl, refetchImage } = useProfileImage();
   const [toggle, setToggle] = useState(false);
   const [caption, setCaption] = useState("");
   const { data, status } = useSession();
@@ -49,7 +50,7 @@ export default function Sidebar() {
   const { theme, setTheme } = useTheme();
 
   useEffect(() => {
-    handleGetImage();
+    refetchImage();
   }, []);
 
   function handleOnclick() {
@@ -73,17 +74,6 @@ export default function Sidebar() {
       }
     }
   }
-
-  const handleGetImage = async () => {
-    try {
-      const response = await axios.post("/api/s3/get", {
-        email: data?.user?.email,
-      });
-      setImageUrl(response.data.imageUrl);
-    } catch (error) {
-      console.error("Error fetching image:", error);
-    }
-  };
 
   return status == "loading" ? (
     <div className="flex justify-center items-center w-screen h-screen">
@@ -126,7 +116,7 @@ export default function Sidebar() {
                   width={40}
                   height={40}
                   className="w-10 h-10 rounded-full"
-                  src={setImage || "/public/image.png"}
+                  src={imageUrl || "/public/image.png"}
                   alt="Profile"
                 />
                 <div className="flex flex-col items-start ">
