@@ -29,7 +29,6 @@ const sidebarData = [
   ,
 ];
 
-import { useRouter } from "next/navigation";
 import { useToast } from "@/hooks/use-toast";
 import { useTheme } from "next-themes";
 import { useSession, signOut } from "next-auth/react";
@@ -42,7 +41,6 @@ import { Skeleton } from "./ui/skeleton";
 
 export default function Sidebar() {
   const { toast } = useToast();
-  const Router = useRouter();
   const [toggle, setToggle] = useState(false);
   const [caption, setCaption] = useState("");
   const { data, status } = useSession();
@@ -81,10 +79,10 @@ export default function Sidebar() {
       <div className="py-6 top-0  fixed pr-10 flex flex-col min-h-screen justify-between items-end">
         <ul className="space-y-2 ">
           {sidebarData.map((item) => (
-            <Link href={item?.Link} key={item.name}>
+            <Link href={item?.Link || "../public/image.png"} key={item?.name}>
               <li className="flex hover:bg-zinc-100 dark:hover:bg-zinc-900 items-center gap-4 px-5 py-3 rounded-full cursor-pointer transition">
-                {item.icon}
-                <span className="text-2xl">{item.name}</span>
+                {item?.icon}
+                <span className="text-2xl">{item?.name}</span>
               </li>
             </Link>
           ))}

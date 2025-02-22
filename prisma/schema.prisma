@@ -20,13 +20,14 @@ model user {
   password  String?
   createdAt DateTime @default(now())
   post      Post[]
+  imageName String?
 }
 
 model Post {
-  id      String  @id @default(uuid())
-  Caption String
+  id        String   @id @default(uuid())
+  Caption   String
   createdAt DateTime @default(now())
-  likes   String?
-  user    user?   @relation(fields: [userId], references: [id])
-  userId  String?
+  likes     String?
+  user      user?    @relation(fields: [userId], references: [id])
+  userId    String?
 }

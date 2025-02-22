@@ -7,10 +7,7 @@ import {
   DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
 
-import {
-  Dialog,
-  DialogContent,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 
 import React, { useState, useEffect, useRef } from "react";
 import { Pen, Camera, CheckCheckIcon } from "lucide-react";
@@ -23,6 +20,7 @@ import Sidebar from "@/components/left-sidebar";
 
 export default function Account() {
   const { data: session, status, update } = useSession();
+  const [imageUrl, setimageUrl] = useState("");
   const { toast } = useToast();
   const [handlePasswordfield, setHandlePasswordField] = useState(false);
   const [handleImagePreview, sethandleImagePreview] = useState(false);
@@ -52,6 +50,7 @@ export default function Account() {
         } else {
           setHandlePasswordField(false);
         }
+        handleGetImage();
       } catch (error) {
         console.log("Error fetching user:", error);
       }
@@ -59,6 +58,7 @@ export default function Account() {
 
     fetchUser();
   }, [session?.user?.email]);
+  useEffect(()=>{},[])
 
   function both() {
     toggleNameEdit();
@@ -127,17 +127,30 @@ export default function Account() {
     reader.onloadend = async () => setImagePreview(reader.result as string);
     const formData = new FormData();
     formData.append("file", file);
+    formData.append("email", session?.user?.email ?? "");
     console.log(imagePreview, "photo");
     reader.readAsDataURL(file);
 
     try {
       const response = await axios.post("/api/s3/post", formData);
       console.log(response.data);
+      toast({
+        title: response.data.message,
+      });
+      handleGetImage();
     } catch (error) {
       console.error("Error uploading image:", error);
     } finally {
       setIsUploading(false);
     }
+  };
+
+  const handleGetImage = async () => {
+    const response = await axios.post("/api/s3/get", {
+      email: session?.user?.email,
+    });
+    setimageUrl(response.data.imageUrl);
+    console.log(response.data.imageUrl);
   };
 
   const removeImage = () => {
@@ -179,7 +192,7 @@ export default function Account() {
             >
               <div className="w-60 h-60 overflow-hidden rounded-full">
                 <img
-                  src={imagePreview ?? session?.user?.image ?? undefined}
+                  src={imageUrl}
                   className="w-full h-full object-cover"
                   alt="User Avatar"
                 />
