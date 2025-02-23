@@ -62,7 +62,6 @@ export default function Middlebar() {
       const posts = response.data.post;
       const signedUrls = response.data.link;
 
-      // Combine posts with their image URLs
       const postsWithImages = posts.map((post: Post) => ({
         ...post,
         imageUrl: signedUrls[post.id],
@@ -80,8 +79,8 @@ export default function Middlebar() {
         email: session?.user?.email,
       });
       const posts = response.data.posts;
-      console.log(response.data);
       const signedUrls = response.data.link || {};
+      console.log(signedUrls);
 
       const postsWithImages = posts.map((post: Post) => ({
         ...post,
@@ -143,50 +142,61 @@ export default function Middlebar() {
     fetchUserPost();
   }, [fetchPosts, fetchUserPost]);
 
-  const renderPostItem = (post: PostWithImage) => (
-    <div key={post.id} className="p-4 px-6 flex items-start space-x-4">
-      {post.imageUrl && (
-        <Avatar className="mt-2">
-          <AvatarImage src={post.imageUrl || ""} alt="User Avatar" />
-          <AvatarFallback>
-            <Camera />
-          </AvatarFallback>
-        </Avatar>
-      )}
-      <div className="flex-1">
-        <div className="flex items-center py-2 space-x-2">
-          <span className="font-semibold">{post.user?.name}</span>
-          <span className="text-zinc-500 text-sm">
-            {new Date(post.createdAt).toLocaleString()}
-          </span>
-        </div>
+  const renderPostItem = (post: PostWithImage) =>
+    post ? (
+      <div key={post.id} className="p-4 px-6 flex items-start space-x-4">
         {post.imageUrl && (
-          <div className="w-full aspect-auto">
-            <img
-              className="w-full h rounded-xl object-contain"
-              src={post.imageUrl}
-              alt={`Post by ${post.user?.name}`}
-            />
-          </div>
+          <Avatar className="mt-2">
+            <AvatarImage src={post.imageUrl || ""} alt="User Avatar" />
+            <AvatarFallback>
+              <Camera />
+            </AvatarFallback>
+          </Avatar>
         )}
-
-        <p className="mt-2">{post.Caption}</p>
-        <div className="mt-2 flex items-center space-x-2">
-          <Heart className="text-zinc-500 hover:text-red-500 cursor-pointer" />
-          <span className="text-zinc-500">0</span>
-          {!tabBar && (
-            <span
-              onClick={() => DeletePost(post.id)}
-              className="text-zinc-500 hover:text-red-500 cursor-pointer"
-            >
-              <Trash2Icon />
+        <div className="flex-1">
+          <div className="flex items-center py-2 space-x-2">
+            <span className="font-semibold">{post.user?.name}</span>
+            <span className="text-zinc-500 text-sm">
+              {new Date(post.createdAt).toLocaleString()}
             </span>
+          </div>
+          <p className="my-2">
+            {post.Caption.split(" ").map((word, index) =>
+              word.startsWith("#") ? (
+                <span key={index} className="text-purple-400">
+                  {word}{" "}
+                </span>
+              ) : (
+                word + " "
+              )
+            )}
+          </p>
+          {post.imageUrl && (
+            <div className="w-full aspect-auto">
+              <img
+                className="w-full max-h-[60vh] rounded-xl object-cover"
+                src={post.imageUrl}
+                alt={`Post by ${post.user?.name}`}
+              />
+            </div>
           )}
+          <div className="mt-2 flex items-center space-x-2">
+            <Heart className="text-zinc-500 hover:text-red-500 cursor-pointer" />
+            <span className="text-zinc-500">0</span>
+            {!tabBar && (
+              <span
+                onClick={() => DeletePost(post.id)}
+                className="text-zinc-500 hover:text-red-500 cursor-pointer"
+              >
+                <Trash2Icon />
+              </span>
+            )}
+          </div>
         </div>
       </div>
-      <div className="w-10"></div>
-    </div>
-  );
+    ) : (
+      <Skeleton />
+    );
 
   return (
     <div className="border-x-2 min-h-screen dark:border-zinc-800 w-1/2 relative">
