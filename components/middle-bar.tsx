@@ -1,22 +1,26 @@
 import { useSession } from "next-auth/react";
 import { Avatar, AvatarImage, AvatarFallback } from "./ui/avatar";
-import { Camera, Heart } from "lucide-react";
+import { Camera, Heart, Trash2Icon } from "lucide-react";
 import { useEffect, useRef, useState, useCallback } from "react";
 import { Skeleton } from "./ui/skeleton";
 import { useToast } from "@/hooks/use-toast";
 import axios from "axios";
 import { Input } from "./ui/input";
-import { Trash2Icon } from "lucide-react";
 import { useProfileImage } from "@/hooks/useProfileImage";
 
 type Post = {
   id: string;
   Caption: string;
   createdAt: string;
+  postName?: string;
   user?: {
     name?: string;
     image?: string;
   };
+};
+
+type PostWithImage = Post & {
+  imageUrl?: string;
 };
 
 export default function Middlebar() {
@@ -26,8 +30,8 @@ export default function Middlebar() {
   const { data: session } = useSession();
   const textAreaRef = useRef<HTMLTextAreaElement>(null);
   const [caption, setCaption] = useState("");
-  const [fetchPost, setFetchPost] = useState<Post[]>([]);
-  const [userpost, setUserPost] = useState<Post[]>([]);
+  const [fetchPost, setFetchPost] = useState<PostWithImage[]>([]);
+  const [userpost, setUserPost] = useState<PostWithImage[]>([]);
   const [file, setFile] = useState<File | null>(null);
   const [isPosting, setIsPosting] = useState(false);
   const [tabBar, setTabBar] = useState(true);
@@ -55,7 +59,16 @@ export default function Middlebar() {
   const fetchPosts = useCallback(async () => {
     try {
       const response = await axios.get("/api/getpost");
-      setFetchPost(response.data.post);
+      const posts = response.data.post;
+      const signedUrls = response.data.link;
+
+      // Combine posts with their image URLs
+      const postsWithImages = posts.map((post: Post) => ({
+        ...post,
+        imageUrl: signedUrls[post.id],
+      }));
+
+      setFetchPost(postsWithImages);
     } catch (error) {
       console.error("Fetch posts failed:", error);
     }
@@ -66,50 +79,63 @@ export default function Middlebar() {
       const response = await axios.post("/api/myposts", {
         email: session?.user?.email,
       });
-      setUserPost(response.data.posts);
+      const posts = response.data.posts;
+      console.log(response.data);
+      const signedUrls = response.data.link || {};
+
+      const postsWithImages = posts.map((post: Post) => ({
+        ...post,
+        imageUrl: signedUrls[post.id],
+      }));
+
+      setUserPost(postsWithImages);
     } catch (error) {
       console.error("Fetch user posts failed:", error);
     }
   }, [session?.user?.email]);
 
   const handlePost = useCallback(async () => {
-    const formdata = new FormData();
-    if (file) formdata.append("file", file);
+    if (!caption.trim() || isPosting) return;
 
-    if (caption.trim() && !isPosting) {
-      setIsPosting(true);
-      try {
-        const formData = new FormData();
-        formData.append("file", file ?? "");
-        formData.append("email", session?.user?.email ?? "");
-        formData.append("caption", caption);
+    setIsPosting(true);
+    try {
+      const formData = new FormData();
+      if (file) formData.append("file", file);
+      formData.append("email", session?.user?.email ?? "");
+      formData.append("caption", caption);
 
-        await axios.post("/api/post", formData, {
-          headers: { "Content-Type": "multipart/form-data" },
-        });
-        await fetchPosts();
-        setCaption("");
-        if (fileInputRef.current) {
-          fileInputRef.current.value = "";
-        }
-      } catch (error) {
-        console.error("Post failed:", error);
-      } finally {
-        setIsPosting(false);
+      await axios.post("/api/post", formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+
+      await fetchPosts();
+      setCaption("");
+      setFile(null);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
       }
+    } catch (error) {
+      console.error("Post failed:", error);
+      toast({ title: "Failed to create post" });
+    } finally {
+      setIsPosting(false);
     }
-  }, [caption, session?.user?.email, fetchPosts]);
+  }, [caption, file, session?.user?.email, fetchPosts, toast]);
 
   const DeletePost = async (id: string) => {
-    const response = await axios.post("/api/deletepost", {
-      email: session?.user?.email,
-      id: id,
-    });
-    const data = await response.data;
-    console.log(data);
-    toast({ title: data.message });
-    setUserPost((prevPosts) => prevPosts.filter((post) => post.id !== id));
-    setFetchPost((prevPosts) => prevPosts.filter((post) => post.id !== id));
+    try {
+      const response = await axios.post("/api/deletepost", {
+        email: session?.user?.email,
+        id: id,
+      });
+
+      toast({ title: response.data.message });
+      setUserPost((prevPosts) => prevPosts.filter((post) => post.id !== id));
+      setFetchPost((prevPosts) => prevPosts.filter((post) => post.id !== id));
+    } catch (error) {
+      console.error("Delete failed:", error);
+      toast({ title: "Failed to delete post" });
+    }
   };
 
   useEffect(() => {
@@ -117,24 +143,33 @@ export default function Middlebar() {
     fetchUserPost();
   }, [fetchPosts, fetchUserPost]);
 
-  const renderPostItem = (post: Post) => (
+  const renderPostItem = (post: PostWithImage) => (
     <div key={post.id} className="p-4 px-6 flex items-start space-x-4">
-      <Avatar className="mt-2">
-        <AvatarImage src={post.user?.image || ""} alt="User Avatar" />
-        <AvatarFallback>
-          <Camera />
-        </AvatarFallback>
-      </Avatar>
+      {post.imageUrl && (
+        <Avatar className="mt-2">
+          <AvatarImage src={post.imageUrl || ""} alt="User Avatar" />
+          <AvatarFallback>
+            <Camera />
+          </AvatarFallback>
+        </Avatar>
+      )}
       <div className="flex-1">
-        <div className="flex items-center space-x-2">
-          <span className="font-semibold">
-            {post.user?.name || post.user?.name}
-          </span>
+        <div className="flex items-center py-2 space-x-2">
+          <span className="font-semibold">{post.user?.name}</span>
           <span className="text-zinc-500 text-sm">
             {new Date(post.createdAt).toLocaleString()}
           </span>
         </div>
-        {/* <img className="pr-10" src={imageUrl} alt="awdawd" /> */}
+        {post.imageUrl && (
+          <div className="w-full aspect-auto">
+            <img
+              className="w-full h rounded-xl object-contain"
+              src={post.imageUrl}
+              alt={`Post by ${post.user?.name}`}
+            />
+          </div>
+        )}
+
         <p className="mt-2">{post.Caption}</p>
         <div className="mt-2 flex items-center space-x-2">
           <Heart className="text-zinc-500 hover:text-red-500 cursor-pointer" />
@@ -149,18 +184,19 @@ export default function Middlebar() {
           )}
         </div>
       </div>
+      <div className="w-10"></div>
     </div>
   );
 
   return (
     <div className="border-x-2 min-h-screen dark:border-zinc-800 w-1/2 relative">
-      <div className="sticky top-0 z-50 dark:bg-darktheme bg-white  ">
+      <div className="sticky top-0 z-50 dark:bg-darktheme bg-white">
         <div className="flex border-y-2 dark:border-zinc-800 flex-row w-full">
           <button
             onClick={() => setTabBar(true)}
-            className={`w-1/2 py-4 text-lg font-semibold  transition-all duration-200 ${
+            className={`w-1/2 py-4 text-lg font-semibold transition-all duration-200 ${
               tabBar
-                ? "border-b-2 border-blue-500 "
+                ? "border-b-2 border-blue-500"
                 : "dark:border-[#121212] border-white border-b-2"
             }`}
           >
@@ -168,10 +204,10 @@ export default function Middlebar() {
           </button>
           <button
             onClick={() => setTabBar(false)}
-            className={`w-1/2 py-4 text-lg font-semibold  transition-all duration-200 ${
+            className={`w-1/2 py-4 text-lg font-semibold transition-all duration-200 ${
               tabBar
-                ? "dark:border-[#121212] border-white border-b-2 "
-                : "border-b-2 border-blue-500 "
+                ? "dark:border-[#121212] border-white border-b-2"
+                : "border-b-2 border-blue-500"
             }`}
           >
             My Posts
@@ -181,7 +217,7 @@ export default function Middlebar() {
 
       {tabBar ? (
         <div>
-          <div className=" px-2 py-1 border-b-2 dark:border-zinc-800">
+          <div className="px-2 py-1 border-b-2 dark:border-zinc-800">
             <div className="Post py-2 flex flex-row items-start">
               <div className="mx-2">
                 <Avatar>
@@ -207,11 +243,10 @@ export default function Middlebar() {
             <div className="flex w-full space-x-4 justify-end">
               <Input
                 ref={fileInputRef}
-                onChange={(e) => {
-                  setFile(e.target.files?.[0] || null);
-                }}
+                onChange={(e) => setFile(e.target.files?.[0] || null)}
                 type="file"
-                className="py-2 w-[35%] text-blue-400  px-5 rounded-3xl font-medium "
+                accept="image/*"
+                className="py-2 w-[35%] text-blue-400 px-5 rounded-3xl font-medium"
               />
               <button
                 onClick={handlePost}

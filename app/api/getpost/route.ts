@@ -1,7 +1,9 @@
 import { PrismaClient } from "@prisma/client";
 import { NextResponse } from "next/server";
-import { S3Client } from "@aws-sdk/client-s3";
+import { S3Client, GetObjectCommand } from "@aws-sdk/client-s3";
+import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 
+const prisma = new PrismaClient();
 const s3client = new S3Client({
   region: process.env.BUCKET_REGION!,
   credentials: {
@@ -10,23 +12,51 @@ const s3client = new S3Client({
   },
 });
 
-const prisma = new PrismaClient();
-
 export async function GET() {
-  const newPost = await prisma.post.findMany({
-    include: {
-      user: {
-        select: {
-          email: true,
-          name: true,
-          createdAt: true,
+  try {
+    const newPost = await prisma.post.findMany({
+      include: {
+        user: {
+          select: {
+            email: true,
+            name: true,
+            createdAt: true,
+            imageName: true,
+          },
         },
       },
-    },
-    orderBy: {
-      createdAt: "desc",
-    },
-  });
+      orderBy: {
+        createdAt: "desc",
+      },
+    });
 
-  return NextResponse.json({ message: "Post Successfull", post: newPost });
+    const signedUrls: Record<string, string> = {};
+
+    await Promise.all(
+      newPost.map(async (post) => {
+        if (post.postName) {
+          const command = new GetObjectCommand({
+            Bucket: process.env.BUCKET_POST_NAME!,
+            Key: post.postName,
+          });
+
+          signedUrls[post.id] = await getSignedUrl(s3client, command, {
+            expiresIn: 93600,
+          });
+        }
+      })
+    );
+
+    return NextResponse.json({
+      message: "Post retrieval successful",
+      post: newPost,
+      link: signedUrls,
+    });
+  } catch (error) {
+    console.error("Error fetching posts:", error);
+    return NextResponse.json(
+      { message: "Failed to retrieve posts" },
+      { status: 500 }
+    );
+  }
 }
