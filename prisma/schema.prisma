@@ -27,7 +27,7 @@ model Post {
   id        String   @id @default(uuid())
   Caption   String
   createdAt DateTime @default(now())
-  likes     String?
+  likes     Int?
   user      user?    @relation(fields: [userId], references: [id])
   postName  String?
   userId    String?
