@@ -13,6 +13,7 @@ type Post = {
   Caption: string;
   createdAt: string;
   postName?: string;
+  mimeType: string;
   user?: {
     name?: string;
     image?: string;
@@ -68,6 +69,7 @@ export default function Middlebar() {
       }));
 
       setFetchPost(postsWithImages);
+      console.log(postsWithImages);
     } catch (error) {
       console.error("Fetch posts failed:", error);
     }
@@ -170,17 +172,21 @@ export default function Middlebar() {
               )
             )}
           </p>
-          {post.imageUrl ? (
-            <div className="w-full aspect-auto">
-              <img
-                className="w-full max-h-[60vh] rounded-xl object-cover"
-                src={post.imageUrl}
-                alt={`Post by ${post.user?.name}`}
-              />
-            </div>
+          {post.mimeType?.startsWith("video/") ? (
+            <video
+              muted
+              className="w-full max-h-[60vh] rounded-xl object-cover"
+              src={post.imageUrl}
+              controls
+            />
           ) : (
-            <Skeleton className="h-10 w-10 rounded-full mt-2" />
+            <img
+              className="w-full max-h-[60vh] rounded-xl object-cover"
+              src={post.imageUrl}
+              alt={`Post by ${post.user?.name}`}
+            />
           )}
+
           <div className="mt-2 flex items-center space-x-2">
             <Heart className="text-zinc-500 hover:text-red-500 cursor-pointer" />
             <span className="text-zinc-500">0</span>
@@ -232,7 +238,10 @@ export default function Middlebar() {
             <div className="Post py-2 flex flex-row items-start">
               <div className="mx-2">
                 <Avatar>
-                  <AvatarImage src={imageUrl || ""} alt="User Avatar" />
+                  <AvatarImage
+                    src={imageUrl || "/public/wallpaper.jpg"}
+                    alt="User Avatar"
+                  />
                   <AvatarFallback>
                     <Camera />
                   </AvatarFallback>
@@ -256,7 +265,7 @@ export default function Middlebar() {
                 ref={fileInputRef}
                 onChange={(e) => setFile(e.target.files?.[0] || null)}
                 type="file"
-                accept="image/*"
+                accept="image/*,video/*"
                 className="py-2 w-[35%] text-blue-400 px-5 rounded-3xl font-medium"
               />
               <button

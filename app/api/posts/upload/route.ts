@@ -20,6 +20,16 @@ export async function POST(req: NextRequest) {
     const caption = formData.get("caption") as string;
     const email = formData.get("email") as string;
 
+    if (file instanceof File) {
+      const MAX_FILE_SIZE = 40 * 1024 * 1024;
+      if (file.size > MAX_FILE_SIZE) {
+        return NextResponse.json(
+          { message: "File size exceeds 40 MB limit" },
+          { status: 400 }
+        );
+      }
+    }
+
     if (!caption && !email) {
       return NextResponse.json(
         { message: "Empty email and caption" },
@@ -28,22 +38,26 @@ export async function POST(req: NextRequest) {
     }
 
     let fileHash: string | null = null;
+    let mimeType: string | null = null;
 
     if (file instanceof File) {
       const bytes = await file.arrayBuffer();
       const buffer = Buffer.from(bytes);
+      console.log(buffer);
 
       fileHash = crypto
         .createHash("sha256")
         .update(caption || email)
         .digest("hex");
 
+      mimeType = file.type;
+
       await s3client.send(
         new PutObjectCommand({
           Bucket: process.env.BUCKET_POST_NAME!,
           Key: fileHash,
           Body: buffer,
-          ContentType: file.type,
+          ContentType: mimeType,
         })
       );
     }
@@ -61,6 +75,7 @@ export async function POST(req: NextRequest) {
       data: {
         Caption: caption,
         postName: fileHash,
+        mimeType: mimeType,
         user: {
           connect: { id: findId.id },
         },
