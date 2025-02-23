@@ -29,5 +29,6 @@ model Post {
   createdAt DateTime @default(now())
   likes     String?
   user      user?    @relation(fields: [userId], references: [id])
+  postName  String?
   userId    String?
 }

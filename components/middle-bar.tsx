@@ -21,13 +21,14 @@ type Post = {
 
 export default function Middlebar() {
   const { imageUrl } = useProfileImage();
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
   const { data: session } = useSession();
   const textAreaRef = useRef<HTMLTextAreaElement>(null);
   const [caption, setCaption] = useState("");
   const [fetchPost, setFetchPost] = useState<Post[]>([]);
   const [userpost, setUserPost] = useState<Post[]>([]);
-  const [file, setFile] = useState<File>();
+  const [file, setFile] = useState<File | null>(null);
   const [isPosting, setIsPosting] = useState(false);
   const [tabBar, setTabBar] = useState(true);
 
@@ -72,16 +73,25 @@ export default function Middlebar() {
   }, [session?.user?.email]);
 
   const handlePost = useCallback(async () => {
+    const formdata = new FormData();
+    if (file) formdata.append("file", file);
+
     if (caption.trim() && !isPosting) {
       setIsPosting(true);
       try {
-        await axios.post("/api/post", {
-          caption: caption.trim(),
-          email: session?.user?.email,
-        });
+        const formData = new FormData();
+        formData.append("file", file ?? "");
+        formData.append("email", session?.user?.email ?? "");
+        formData.append("caption", caption);
 
+        await axios.post("/api/post", formData, {
+          headers: { "Content-Type": "multipart/form-data" },
+        });
         await fetchPosts();
         setCaption("");
+        if (fileInputRef.current) {
+          fileInputRef.current.value = "";
+        }
       } catch (error) {
         console.error("Post failed:", error);
       } finally {
@@ -196,8 +206,9 @@ export default function Middlebar() {
             </div>
             <div className="flex w-full space-x-4 justify-end">
               <Input
+                ref={fileInputRef}
                 onChange={(e) => {
-                  setFile(e.target.files?.[0]);
+                  setFile(e.target.files?.[0] || null);
                 }}
                 type="file"
                 className="py-2 w-[35%] text-blue-400  px-5 rounded-3xl font-medium "

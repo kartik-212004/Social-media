@@ -9,8 +9,9 @@ import {
 
 import { useProfileImage } from "@/hooks/useProfileImage";
 import { Button } from "./ui/button";
+import { Input } from "./ui/input";
 import { useSession } from "next-auth/react";
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
 import axios from "axios";
 
 interface PostProps {
@@ -19,33 +20,43 @@ interface PostProps {
 }
 
 export default function Post({ on, onOpenChange }: PostProps) {
-  const { data } = useSession();
+  const { data: session } = useSession();
   const [caption, setCaption] = useState("");
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [isPosting, setIsPosting] = useState(false);
   const { imageUrl, refetchImage } = useProfileImage();
+  const [file, setFile] = useState<File | null>(null);
 
   useEffect(() => {
     refetchImage();
   }, []);
 
   const handlePost = useCallback(async () => {
+    const formdata = new FormData();
+    if (file) formdata.append("file", file);
+
     if (caption.trim() && !isPosting) {
       setIsPosting(true);
       try {
-        await axios.post("/api/post", {
-          caption: caption.trim(),
-          email: data?.user?.email,
-        });
+        const formData = new FormData();
+        formData.append("file", file ?? "");
+        formData.append("email", session?.user?.email ?? "");
+        formData.append("caption", caption);
 
+        await axios.post("/api/post", formData, {
+          headers: { "Content-Type": "multipart/form-data" },
+        });
         setCaption("");
-        onOpenChange();
+        if (fileInputRef.current) {
+          fileInputRef.current.value = "";
+        }
       } catch (error) {
         console.error("Post failed:", error);
       } finally {
         setIsPosting(false);
       }
     }
-  }, [caption, data?.user?.email, onOpenChange]);
+  }, [caption, session?.user?.email, onOpenChange]);
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === "Enter" && !e.shiftKey) {
@@ -53,7 +64,6 @@ export default function Post({ on, onOpenChange }: PostProps) {
       handlePost();
     }
   };
-
 
   return (
     <Dialog open={on} onOpenChange={onOpenChange}>
@@ -80,6 +90,14 @@ export default function Post({ on, onOpenChange }: PostProps) {
             </DialogDescription>
           </div>
         </DialogHeader>
+        <Input
+          ref={fileInputRef}
+          onChange={(e) => {
+            setFile(e.target.files?.[0] || null);
+          }}
+          type="file"
+          className="py-2  text-blue-400  px-5 rounded-3xl font-medium "
+        />
         <Button
           onClick={handlePost}
           disabled={!caption.trim() || isPosting}
