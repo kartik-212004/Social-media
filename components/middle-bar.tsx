@@ -65,7 +65,7 @@ export default function Middlebar() {
       const response = await axios.post("/api/myposts", {
         email: session?.user?.email,
       });
-      setUserPost(response.data.posts.reverse());
+      setUserPost(response.data.posts);
     } catch (error) {
       console.error("Fetch user posts failed:", error);
     }
@@ -124,7 +124,7 @@ export default function Middlebar() {
             {new Date(post.createdAt).toLocaleString()}
           </span>
         </div>
-        <img className="pr-10" src={imageUrl} alt="awdawd" />
+        {/* <img className="pr-10" src={imageUrl} alt="awdawd" /> */}
         <p className="mt-2">{post.Caption}</p>
         <div className="mt-2 flex items-center space-x-2">
           <Heart className="text-zinc-500 hover:text-red-500 cursor-pointer" />

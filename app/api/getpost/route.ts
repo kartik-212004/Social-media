@@ -14,6 +14,9 @@ export async function GET() {
         },
       },
     },
+    orderBy: {
+      createdAt: "desc",
+    },
   });
 
   return NextResponse.json({ message: "Post Successfull", post: newPost });
