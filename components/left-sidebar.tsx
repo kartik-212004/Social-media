@@ -7,9 +7,9 @@ import {
   HomeIcon,
   Search,
   MessageCircle,
-  Pyramid,
   LogOut,
   User,
+  Settings,
 } from "lucide-react";
 
 import {
@@ -24,7 +24,7 @@ const sidebarData = [
   { name: "Explore", icon: <Search />, Link: "/explore" },
   { name: "Notifications", icon: <BellRing />, Link: "/notification" },
   { name: "Messages", icon: <MessageCircle />, Link: "/message" },
-  { name: "Premium", icon: <Pyramid />, Link: "/premium" },
+  { name: "Account", icon: <Settings />, Link: "/account" },
   { name: "Profile", icon: <User />, Link: "/profile" },
   ,
 ];
@@ -117,7 +117,7 @@ export default function Sidebar() {
                   width={40}
                   height={40}
                   className="w-10 h-10 object-cover rounded-full"
-                  src={imageUrl || noProfile}
+                  src={imageUrl || noProfile }
                   alt="Profile"
                 />
                 <div className="flex flex-col items-start ">

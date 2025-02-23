@@ -58,7 +58,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ message: "User Not Found" }, { status: 400 });
     }
 
-    const newPost = await prisma.post.create({
+    await prisma.post.create({
       data: {
         Caption: caption,
         postName: fileHash,

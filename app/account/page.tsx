@@ -48,7 +48,7 @@ export default function Account() {
       if (!session?.user?.email) return;
 
       try {
-        const response = await axios.post("/api/minor/user/getpassword", {
+        const response = await axios.post("/api/settings/get-password", {
           email: session.user.email,
         });
 
@@ -145,7 +145,7 @@ export default function Account() {
       return toast({ title: "Please Enter A New Name" });
     }
     try {
-      await axios.post("/api/userdata", {
+      await axios.post("/api/settings/change-name", {
         name: username,
         email: session?.user?.email,
       });
@@ -180,7 +180,7 @@ export default function Account() {
     }
 
     try {
-      const response = await axios.post("/api/minor/user/changepassword", {
+      const response = await axios.post("/api/settings/change-password", {
         email: session?.user?.email,
         password: passwordValue,
       });

@@ -13,7 +13,7 @@ const useFetchUserPassword = () => {
       if (!session?.user?.email) return;
 
       try {
-        const response = await axios.post("/api/minor/user/getpassword", {
+        const response = await axios.post("/api/settings/get-password", {
           email: session.user.email,
         });
 

@@ -58,7 +58,7 @@ export default function Middlebar() {
 
   const fetchPosts = useCallback(async () => {
     try {
-      const response = await axios.get("/api/getpost");
+      const response = await axios.get("/api/posts/public-posts");
       const posts = response.data.post;
       const signedUrls = response.data.link;
 
@@ -75,12 +75,11 @@ export default function Middlebar() {
 
   const fetchUserPost = useCallback(async () => {
     try {
-      const response = await axios.post("/api/myposts", {
+      const response = await axios.post("/api/posts/user-posts", {
         email: session?.user?.email,
       });
       const posts = response.data.posts;
       const signedUrls = response.data.link || {};
-      console.log(signedUrls);
 
       const postsWithImages = posts.map((post: Post) => ({
         ...post,
@@ -103,7 +102,7 @@ export default function Middlebar() {
       formData.append("email", session?.user?.email ?? "");
       formData.append("caption", caption);
 
-      await axios.post("/api/post", formData, {
+      await axios.post("/api/posts/upload", formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
 
@@ -123,7 +122,7 @@ export default function Middlebar() {
 
   const DeletePost = async (id: string) => {
     try {
-      const response = await axios.post("/api/deletepost", {
+      const response = await axios.post("/api/posts/delete-post", {
         email: session?.user?.email,
         id: id,
       });
@@ -145,14 +144,17 @@ export default function Middlebar() {
   const renderPostItem = (post: PostWithImage) =>
     post ? (
       <div key={post.id} className="p-4 px-6 flex items-start space-x-4">
-        {post.imageUrl && (
+        {post.imageUrl ? (
           <Avatar className="mt-2">
-            <AvatarImage src={post.imageUrl || ""} alt="User Avatar" />
+            <AvatarImage src={post.imageUrl} alt="User Avatar" />
             <AvatarFallback>
               <Camera />
             </AvatarFallback>
           </Avatar>
+        ) : (
+          <Skeleton className="h-10 w-10 rounded-full mt-2" />
         )}
+
         <div className="flex-1">
           <div className="flex items-center py-2 space-x-2">
             <span className="font-semibold">{post.user?.name}</span>
@@ -171,7 +173,7 @@ export default function Middlebar() {
               )
             )}
           </p>
-          {post.imageUrl && (
+          {post.imageUrl ? (
             <div className="w-full aspect-auto">
               <img
                 className="w-full max-h-[60vh] rounded-xl object-cover"
@@ -179,6 +181,8 @@ export default function Middlebar() {
                 alt={`Post by ${post.user?.name}`}
               />
             </div>
+          ) : (
+            <Skeleton className="h-10 w-10 rounded-full mt-2" />
           )}
           <div className="mt-2 flex items-center space-x-2">
             <Heart className="text-zinc-500 hover:text-red-500 cursor-pointer" />
