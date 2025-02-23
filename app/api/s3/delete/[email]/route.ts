@@ -12,7 +12,7 @@ export async function DELETE(
   req: NextRequest,
   { params }: { params: { email: string } }
 ) {
-  const { email } = await params;
+  const { email } =  params;
   console.log("Received Email:", email);
 
   await s3Client.send(

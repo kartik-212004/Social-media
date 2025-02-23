@@ -117,7 +117,7 @@ export default function Sidebar() {
                   width={40}
                   height={40}
                   className="w-10 h-10 object-cover rounded-full"
-                  src={imageUrl || noProfile }
+                  src={imageUrl || noProfile}
                   alt="Profile"
                 />
                 <div className="flex flex-col items-start ">
