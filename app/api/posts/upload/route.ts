@@ -32,7 +32,6 @@ export async function POST(req: NextRequest) {
     if (file instanceof File) {
       const bytes = await file.arrayBuffer();
       const buffer = Buffer.from(bytes);
-      console.log(buffer);
 
       fileHash = crypto
         .createHash("sha256")

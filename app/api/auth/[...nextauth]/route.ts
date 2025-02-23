@@ -91,8 +91,13 @@ const handler = NextAuth({
       return true;
     },
     async session({ session, token }) {
-      if (session?.user) {
+      if (session?.user?.email) {
+        const dbUser = await prisma.user.findUnique({
+          where: { email: session.user.email },
+        });
+
         session.user.id = token.id;
+        session.user.name = dbUser?.name ?? session.user.name;
         session.user.image =
           session.user.image ??
           "https://th.bing.com/th/id/OIP.S171c9HYsokHyCPs9brbPwHaGP?rs=1&pid=ImgDetMain";

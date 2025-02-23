@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
-export async function POST(req: NextRequest) {
+export async function PATCH(req: NextRequest) {
   const { name, email } = await req.json();
   console.log(name, email);
   const modifiedName = await prisma.user.update({
