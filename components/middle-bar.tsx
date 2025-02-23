@@ -122,10 +122,7 @@ export default function Middlebar() {
 
   const DeletePost = async (id: string) => {
     try {
-      const response = await axios.post("/api/posts/delete-post", {
-        email: session?.user?.email,
-        id: id,
-      });
+      const response = await axios.delete(`/api/posts/delete-post/?id=${id}`);
 
       toast({ title: response.data.message });
       setUserPost((prevPosts) => prevPosts.filter((post) => post.id !== id));

@@ -10,11 +10,12 @@ const s3Client = new S3Client({
   },
 });
 
-export async function POST(req: NextRequest) {
+export async function DELETE(req: NextRequest) {
   const prisma = new PrismaClient();
-  const { email, id } = await req.json();
+  const { searchParams } = new URL(req.url);
+  const id = searchParams.get("id");
   try {
-    if (!email) {
+    if (!id) {
       throw new Error("Field Is Empty");
     }
     const postName = await prisma.post.findUnique({
