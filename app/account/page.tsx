@@ -16,7 +16,6 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useSession } from "next-auth/react";
 import axios from "axios";
 import { useToast } from "@/hooks/use-toast";
-import Sidebar from "@/components/left-sidebar";
 import { useProfileImage } from "@/hooks/useProfileImage";
 import useFetchUserPassword from "@/hooks/check-password";
 
@@ -133,8 +132,7 @@ export default function Account() {
 
   return (
     <div className="container mx-auto flex flex-row">
-      <Sidebar />
-      <div className="flex w-[83.33%] dark:border-zinc-800 border-l-2 min-h-screen p-16 space-y-4 relative flex-col">
+      <div className="flex w-5/6 dark:border-zinc-800 border-l-2 min-h-screen p-16 space-y-4 relative flex-col">
         <div className="absolute inset-0 -z-10">
           <Particles
             particleColors={["#ffffff", "#ffffff"]}

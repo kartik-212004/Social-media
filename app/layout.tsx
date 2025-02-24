@@ -4,6 +4,7 @@ import SessionProviders from "./Provider";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/toaster";
+import LayoutWrapper from "./Wrapper";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -38,7 +39,7 @@ export default function RootLayout({
             enableSystem
             disableTransitionOnChange
           >
-            {children}
+            <LayoutWrapper>{children}</LayoutWrapper>
           </ThemeProvider>
         </SessionProviders>
         <Toaster />

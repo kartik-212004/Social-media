@@ -1,5 +1,4 @@
 "use client";
-import Sidebar from "@/components/left-sidebar";
 import { useSession } from "next-auth/react";
 import Middlebar from "@/components/middle-bar";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -14,7 +13,6 @@ export default function Home() {
     </div>
   ) : (
     <div className="container mx-auto w-full flex flex-row ">
-      <Sidebar />
       <Middlebar />
       <Rightsidebar />
     </div>
