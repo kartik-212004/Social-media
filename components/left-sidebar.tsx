@@ -39,14 +39,13 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import Post from "./post";
-import { Skeleton } from "./ui/skeleton";
 
 export default function Sidebar() {
   const { toast } = useToast();
   const { imageUrl, refetchImage } = useProfileImage();
   const [toggle, setToggle] = useState(false);
   const [caption, setCaption] = useState("");
-  const { data, status } = useSession();
+  const { data } = useSession();
   const [isPosting, setIsPosting] = useState(false);
   const { theme, setTheme } = useTheme();
 
@@ -76,12 +75,7 @@ export default function Sidebar() {
     }
   }
 
-  return status == "loading" ? (
-    <div className="flex justify-center items-center w-screen h-screen">
-      {" "}
-      <Skeleton className="w-[100px] h-[20px] rounded-full" />
-    </div>
-  ) : (
+  return  (
     <div className="w-1/3 flex flex-col justify-end items-end">
       <div className="py-6 top-0  fixed pr-10 flex flex-col min-h-screen justify-between items-end">
         <ul className="space-y-2 ">

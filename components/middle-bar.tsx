@@ -2,7 +2,7 @@ import { useSession } from "next-auth/react";
 import { Avatar, AvatarImage, AvatarFallback } from "./ui/avatar";
 import { Camera, Heart, Trash2Icon } from "lucide-react";
 import { useEffect, useRef, useState, useCallback } from "react";
-import { Skeleton } from "./ui/skeleton";
+import Loading from "@/app/loading";
 import { useToast } from "@/hooks/use-toast";
 import axios from "axios";
 import { Input } from "./ui/input";
@@ -36,6 +36,8 @@ export default function Middlebar() {
   const [file, setFile] = useState<File | null>(null);
   const [isPosting, setIsPosting] = useState(false);
   const [tabBar, setTabBar] = useState(true);
+  const [isLoadingPublicPosts, setIsLoadingPublicPosts] = useState(true);
+  const [isLoadingUserPosts, setIsLoadingUserPosts] = useState(true);
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === "Enter" && !e.shiftKey) {
@@ -58,6 +60,7 @@ export default function Middlebar() {
   );
 
   const fetchPosts = useCallback(async () => {
+    setIsLoadingPublicPosts(true);
     try {
       const response = await axios.get("/api/posts/public-posts");
       const posts = response.data.post;
@@ -69,13 +72,16 @@ export default function Middlebar() {
       }));
 
       setFetchPost(postsWithImages);
-      console.log(postsWithImages);
     } catch (error) {
       console.error("Fetch posts failed:", error);
+      toast({ title: "Failed to load posts" });
+    } finally {
+      setIsLoadingPublicPosts(false);
     }
-  }, []);
+  }, [toast]);
 
   const fetchUserPost = useCallback(async () => {
+    setIsLoadingUserPosts(true);
     try {
       const response = await axios.post("/api/posts/user-posts", {
         email: session?.user?.email,
@@ -91,8 +97,11 @@ export default function Middlebar() {
       setUserPost(postsWithImages);
     } catch (error) {
       console.error("Fetch user posts failed:", error);
+      toast({ title: "Failed to load your posts" });
+    } finally {
+      setIsLoadingUserPosts(false);
     }
-  }, [session?.user?.email]);
+  }, [session?.user?.email, toast]);
 
   const handlePost = useCallback(async () => {
     if (!caption.trim() || isPosting) return;
@@ -109,18 +118,19 @@ export default function Middlebar() {
       });
 
       await fetchPosts();
+      await fetchUserPost();
       setCaption("");
-      setFile(null);
       if (fileInputRef.current) {
         fileInputRef.current.value = "";
       }
+      toast({ title: "Post created successfully" });
     } catch (error) {
       console.error("Post failed:", error);
       toast({ title: "Failed to create post" });
     } finally {
       setIsPosting(false);
     }
-  }, [caption, file, session?.user?.email, fetchPosts, toast]);
+  }, [caption, file, session?.user?.email, fetchPosts, fetchUserPost, toast]);
 
   const DeletePost = async (id: string) => {
     try {
@@ -141,21 +151,17 @@ export default function Middlebar() {
   }, [fetchPosts, fetchUserPost]);
 
   const renderPostItem = (post: PostWithImage) =>
-    post ? (
+    post && (
       <div
         key={post.id}
-        className="p-4 px-6 hover:bg-zinc-100 dark:hover:bg-[#070707]  transition-colors duration-200 flex items-start space-x-4"
+        className="p-4 px-6 hover:bg-zinc-100 dark:hover:bg-[#070707] transition-colors duration-200 flex items-start space-x-4"
       >
-        {post.imageUrl ? (
-          <Avatar className="mt-2">
-            <AvatarImage src={post.imageUrl} alt="User Avatar" />
-            <AvatarFallback>
-              <Camera />
-            </AvatarFallback>
-          </Avatar>
-        ) : (
-          <Skeleton className="h-10 w-10 rounded-full mt-2" />
-        )}
+        <Avatar className="mt-2">
+          <AvatarImage src={post.user?.image || ""} alt="User Avatar" />
+          <AvatarFallback>
+            <Camera />
+          </AvatarFallback>
+        </Avatar>
 
         <div className="flex-1">
           <div className="flex items-center py-2 space-x-2">
@@ -175,19 +181,24 @@ export default function Middlebar() {
               )
             )}
           </p>
-          {post.mimeType?.startsWith("video/") ? (
-            <video
-              muted
-              className="w-full max-h-[60vh] rounded-xl object-cover"
-              src={post.imageUrl}
-              controls
-            />
-          ) : (
-            <img
-              className="w-full max-h-[60vh] rounded-xl object-cover"
-              src={post.imageUrl}
-              alt={`Post by ${post.user?.name}`}
-            />
+          {post.imageUrl && (
+            <>
+              {post.mimeType?.startsWith("video/") ? (
+                <video
+                  muted
+                  className="w-full max-h-[60vh] rounded-xl object-cover"
+                  src={post.imageUrl}
+                  controls
+                />
+              ) : (
+                <img
+                  className="w-full max-h-[60vh] rounded-xl object-cover"
+                  src={post.imageUrl}
+                  alt={`Post by ${post.user?.name}`}
+                  loading="lazy"
+                />
+              )}
+            </>
           )}
 
           <div className="mt-2 flex items-center space-x-2">
@@ -204,8 +215,6 @@ export default function Middlebar() {
           </div>
         </div>
       </div>
-    ) : (
-      <Skeleton />
     );
 
   return (
@@ -214,12 +223,12 @@ export default function Middlebar() {
         <div className="flex border-y-2 dark:border-zinc-800 flex-row w-full">
           <button
             onClick={() => setTabBar(true)}
-            className={`w-1/2 py-4 border-x border-x-zinc-800  text-lg font-semibold transition-all duration-200 `}
+            className={`w-1/2 py-4 text-lg font-semibold transition-all duration-200 `}
           >
             <span
               className={`py-2 ${
                 tabBar
-                  ? "border-b-2  border-blue-500"
+                  ? "border-b-2 border-blue-500"
                   : "dark:border-[#121212] border-white border-b-2"
               }`}
             >
@@ -234,7 +243,7 @@ export default function Middlebar() {
               className={`py-2 ${
                 tabBar
                   ? "dark:border-[#121212] border-white border-b-2 "
-                  : "border-b-2  border-blue-500"
+                  : "border-b-2 border-blue-500"
               }`}
             >
               My Posts
@@ -295,14 +304,22 @@ export default function Middlebar() {
           </div>
 
           <div className="divide-y divide-zinc-200 dark:divide-zinc-800">
-            {fetchPost.map(renderPostItem)}
+            {isLoadingPublicPosts ? (
+              <Loading />
+            ) : fetchPost.length > 0 ? (
+              fetchPost.map(renderPostItem)
+            ) : (
+              <div className="p-4 text-center text-zinc-500">
+                No posts available
+              </div>
+            )}
           </div>
         </div>
-      ) : !userpost ? (
-        <Skeleton />
       ) : (
         <div className="divide-y divide-zinc-200 dark:divide-zinc-800">
-          {userpost.length > 0 ? (
+          {isLoadingUserPosts ? (
+            <Loading />
+          ) : userpost.length > 0 ? (
             userpost.map(renderPostItem)
           ) : (
             <div className="p-4 text-center text-zinc-500">No posts yet</div>
