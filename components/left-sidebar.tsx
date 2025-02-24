@@ -87,7 +87,7 @@ export default function Sidebar() {
         <ul className="space-y-2 ">
           {sidebarData.map((item) => (
             <Link href={item?.Link || "../public/image.png"} key={item?.name}>
-              <li className="flex hover:bg-zinc-100 dark:hover:bg-zinc-900 items-center gap-4 px-5 py-3 rounded-full cursor-pointer transition">
+              <li className="flex hover:bg-zinc-100 dark:hover:bg-zinc-900 transition-colors  duration-200 items-center gap-4 px-5 py-3 rounded-full cursor-pointer ">
                 {item?.icon}
                 <span className="text-2xl">{item?.name}</span>
               </li>

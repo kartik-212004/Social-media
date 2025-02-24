@@ -31,8 +31,13 @@ const handler = NextAuth({
           placeholder: "Password",
         },
       },
-      async authorize(credentials: { email: string; password: string }) {
+      async authorize(
+        credentials: Record<"email" | "password", string> | undefined
+      ) {
         try {
+          if (!credentials) {
+            throw new Error("Missing credentials.");
+          }
           const { email, password } = credentials;
           if (!email || !password) {
             throw new Error("Please fill the fields correctly.");

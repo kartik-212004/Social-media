@@ -142,7 +142,10 @@ export default function Middlebar() {
 
   const renderPostItem = (post: PostWithImage) =>
     post ? (
-      <div key={post.id} className="p-4 px-6 flex items-start space-x-4">
+      <div
+        key={post.id}
+        className="p-4 px-6 hover:bg-zinc-100 dark:hover:bg-[#070707]  transition-colors duration-200 flex items-start space-x-4"
+      >
         {post.imageUrl ? (
           <Avatar className="mt-2">
             <AvatarImage src={post.imageUrl} alt="User Avatar" />
@@ -164,7 +167,7 @@ export default function Middlebar() {
           <p className="my-2">
             {post.Caption.split(" ").map((word, index) =>
               word.startsWith("#") ? (
-                <span key={index} className="text-purple-400">
+                <span key={index} className="text-indigo-500">
                   {word}{" "}
                 </span>
               ) : (
