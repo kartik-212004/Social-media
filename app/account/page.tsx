@@ -146,7 +146,7 @@ export default function Account() {
           />
         </div>
 
-        <h1 className="text-3xl">Account Settings</h1>
+        <h1 className="text-3xl pb-4">Account Settings</h1>
 
         <div className="flex space-x-8 flex-row items-start">
           <Dialog open={previewOpen} onOpenChange={setPreviewOpen}>

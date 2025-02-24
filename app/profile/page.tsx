@@ -15,15 +15,15 @@ export default function Profile() {
   const { data: session } = useSession();
   return (
     <>
-      <div className="p-7">
-       
-        <div className="w-2/3 flex flex-row justify-center">
+      <div className="p-16 dark:border-zinc-800 min-h-screen border-l-2">
+        <h1 className="text-3xl pb-8">Profile Dashboard</h1>
+        <div>
           <Avatar className="size-52">
             <AvatarImage
               className="object-cover"
               src={profileImageUrl || undefined}
             ></AvatarImage>
-            <AvatarFallback>CN</AvatarFallback>
+            <AvatarFallback>DAWG</AvatarFallback>
           </Avatar>
         </div>
       </div>
