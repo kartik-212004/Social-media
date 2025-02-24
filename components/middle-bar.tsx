@@ -238,10 +238,7 @@ export default function Middlebar() {
             <div className="Post py-2 flex flex-row items-start">
               <div className="mx-2">
                 <Avatar>
-                  <AvatarImage
-                    src={imageUrl || "/public/wallpaper.jpg"}
-                    alt="User Avatar"
-                  />
+                  <AvatarImage src={imageUrl || ""} alt="User Avatar" />
                   <AvatarFallback>
                     <Camera />
                   </AvatarFallback>

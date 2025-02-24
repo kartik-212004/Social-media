@@ -26,11 +26,12 @@ export function LoginForm({
       email: email,
       password: password,
     });
+
     if (handle?.ok) {
       toast({ title: "Successfully Logged In" });
       router.push("/");
     } else {
-      toast({ title: "User Already Exists" });
+      toast({ title: handle?.error || "Incorrect Password" });
       console.log(handle);
     }
   }

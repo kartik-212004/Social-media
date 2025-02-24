@@ -48,18 +48,18 @@ const handler = NextAuth({
 
           const isPasswordValid = await bcrypt.compare(password, user.password);
           if (!isPasswordValid) {
-            throw new Error("Invalid credentials.");
+            throw new Error("Incorrect Password");
           }
 
           return {
             id: user.id,
             email: user.email,
             name: user.name,
-            image: user.image || null,
           };
         } catch (error) {
-          console.error(error);
-          return null;
+          throw new Error(
+            error instanceof Error ? error.message : "error message"
+          );
         }
       },
     }),
@@ -90,13 +90,12 @@ const handler = NextAuth({
 
       return true;
     },
-    async session({ session, token }) {
+    async session({ session }) {
       if (session?.user?.email) {
         const dbUser = await prisma.user.findUnique({
           where: { email: session.user.email },
         });
 
-        session.user.id = token.id;
         session.user.name = dbUser?.name ?? session.user.name;
         session.user.image =
           session.user.image ??
@@ -105,6 +104,7 @@ const handler = NextAuth({
 
       return session;
     },
+
     async jwt({ token, user }) {
       if (user) {
         token.id = user.id;
