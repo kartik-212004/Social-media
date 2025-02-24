@@ -274,7 +274,7 @@ export default function Middlebar() {
                   ref={textAreaRef}
                   value={caption}
                   rows={1}
-                  placeholder="What's happening?"
+                  placeholder="What's cooking in your mind?"
                   className="w-full bg-transparent placeholder:text-xl text-2xl resize-none overflow-hidden border-b-2 border-zinc-700 focus:outline-none p-2"
                   onChange={handleInput}
                   onKeyDown={handleKeyDown}

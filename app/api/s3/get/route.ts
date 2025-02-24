@@ -13,11 +13,23 @@ const s3Client = new S3Client({
 });
 
 export async function POST(req: NextRequest) {
+  const { searchParams } = new URL(req.url);
+  const id = searchParams.get("id");
+
+  console.log(id);
   try {
     const { email } = await req.json();
 
+    const searchCriteria = id ? { id } : email ? { email } : null;
+
+    if (!searchCriteria) {
+      return NextResponse.json(
+        { message: "Please provide either 'id' or 'email'." },
+        { status: 400 }
+      );
+    }
     const user = await prisma.user.findUnique({
-      where: { email },
+      where: searchCriteria,
       select: { imageName: true },
     });
 
