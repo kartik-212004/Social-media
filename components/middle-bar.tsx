@@ -214,23 +214,31 @@ export default function Middlebar() {
         <div className="flex border-y-2 dark:border-zinc-800 flex-row w-full">
           <button
             onClick={() => setTabBar(true)}
-            className={`w-1/2 py-4 text-lg font-semibold transition-all duration-200 ${
-              tabBar
-                ? "border-b-2 border-blue-500"
-                : "dark:border-[#121212] border-white border-b-2"
-            }`}
+            className={`w-1/2 py-4 border-x border-x-zinc-800  text-lg font-semibold transition-all duration-200 `}
           >
-            For you
+            <span
+              className={`py-2 ${
+                tabBar
+                  ? "border-b-2  border-blue-500"
+                  : "dark:border-[#121212] border-white border-b-2"
+              }`}
+            >
+              For you
+            </span>
           </button>
           <button
             onClick={() => setTabBar(false)}
-            className={`w-1/2 py-4 text-lg font-semibold transition-all duration-200 ${
-              tabBar
-                ? "dark:border-[#121212] border-white border-b-2"
-                : "border-b-2 border-blue-500"
-            }`}
+            className={`w-1/2 py-4 text-lg font-semibold transition-all duration-200`}
           >
-            My Posts
+            <span
+              className={`py-2 ${
+                tabBar
+                  ? "dark:border-[#121212] border-white border-b-2 "
+                  : "border-b-2  border-blue-500"
+              }`}
+            >
+              My Posts
+            </span>
           </button>
         </div>
       </div>
@@ -241,7 +249,11 @@ export default function Middlebar() {
             <div className="Post py-2 flex flex-row items-start">
               <div className="mx-2">
                 <Avatar>
-                  <AvatarImage src={imageUrl || ""} alt="User Avatar" />
+                  <AvatarImage
+                    className="object-cover"
+                    src={imageUrl || ""}
+                    alt="User Avatar"
+                  />
                   <AvatarFallback>
                     <Camera />
                   </AvatarFallback>
