@@ -7,6 +7,12 @@ import {
   DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
 
+import {
+  HoverCard,
+  HoverCardContent,
+  HoverCardTrigger,
+} from "@/components/ui/hover-card";
+
 import Particles from "@/components/ui/Particles";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import React, { useState, useEffect, useRef, useCallback } from "react";
@@ -249,10 +255,18 @@ export default function Account() {
                 onClick={handleNameUpdate}
               />
             ) : (
-              <Pen
-                className="size-5 cursor-pointer"
-                onClick={() => setIsNameEditable(true)}
-              />
+              <HoverCard>
+                <HoverCardTrigger>
+                  {" "}
+                  <Pen
+                    className="size-5 cursor-pointer"
+                    onClick={() => setIsNameEditable(true)}
+                  />
+                </HoverCardTrigger>
+                <HoverCardContent className="rounded-xl py-2 w-fit h-fit">
+                  Edit Name
+                </HoverCardContent>
+              </HoverCard>
             )}
           </div>
         </div>
@@ -281,10 +295,17 @@ export default function Account() {
                   onClick={handlePasswordUpdate}
                 />
               ) : (
-                <Pen
-                  className="size-5 cursor-pointer"
-                  onClick={() => setIsPasswordEditable(true)}
-                />
+                <HoverCard>
+                  <HoverCardTrigger>
+                    <Pen
+                      className="size-5 cursor-pointer"
+                      onClick={() => setIsPasswordEditable(true)}
+                    />
+                  </HoverCardTrigger>
+                  <HoverCardContent className="rounded-xl py-2 w-fit h-fit">
+                    Edit Password
+                  </HoverCardContent>
+                </HoverCard>
               )}
             </div>
             {errorMessage && (
