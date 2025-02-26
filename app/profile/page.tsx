@@ -187,21 +187,32 @@ export default function Profile() {
           <div className="p-8 rounded-lg">
             <h1 className="text-3xl pb-8">Profile Dashboard</h1>
             <div className="flex flex-row space-x-8">
-              <Avatar className="w-32 h-32">
-                <AvatarImage
-                  className="object-cover"
-                  src={profileImageUrl || undefined}
-                />
-                <AvatarFallback className="text-2xl">
-                  {session?.user?.name?.[0] || "U"}
-                </AvatarFallback>
-              </Avatar>
-              <div className="flex flex-col space-y-3 justify-center">
-                <h2 className="text-xl font-semibold">
-                  {session?.user?.name || "username"}
-                  <p className="text-lg">{session?.user?.email}</p>
-                </h2>
-              </div>
+              {isloading ? (
+                <Skeleton className="w-32 h-32 rounded-full" />
+              ) : (
+                <Avatar className="w-32 h-32">
+                  <AvatarImage
+                    className="object-cover"
+                    src={profileImageUrl || undefined}
+                  />
+                  <AvatarFallback className="text-2xl">
+                    {session?.user?.name?.[0] || "U"}
+                  </AvatarFallback>
+                </Avatar>
+              )}
+              {isloading ? (
+                <div className="flex flex-col space-y-3 justify-center">
+                  <Skeleton className="h-6 w-48" />
+                  <Skeleton className="h-4 w-64" />
+                </div>
+              ) : (
+                <div className="flex flex-col space-y-3 justify-center">
+                  <h2 className="text-xl font-semibold">
+                    {session?.user?.name || "username"}
+                    <p className="text-lg">{session?.user?.email}</p>
+                  </h2>
+                </div>
+              )}
             </div>
 
             <div className="mt-10">
@@ -209,14 +220,16 @@ export default function Profile() {
                 <label htmlFor="bio" className="block mb-2">
                   Bio
                 </label>
-                <div className="relative">
+                {isloading ? (
+                  <Skeleton className="w-full h-[80px]" />
+                ) : (
                   <textarea
                     id="bio"
                     value={fetchedBio}
                     disabled={true}
                     className="w-full dark:bg-background border border-[#27272a] rounded p-2 focus:outline-none focus:ring-1 focus:ring-gray-600 min-h-[80px]"
                   />
-                </div>
+                )}
               </div>
               <h3 className="text-lg font-medium mb-3 mt-6">Links</h3>
               {isloading ? <Skeleton className="h-20 w-full" /> : <Links />}
@@ -232,13 +245,16 @@ export default function Profile() {
                 <label htmlFor="bioEdit" className="block mb-2">
                   Bio
                 </label>
-                <div className="relative">
+                {isloading ? (
+                  <Skeleton className="w-full h-[80px]" />
+                ) : (
                   <textarea
                     id="bioEdit"
                     onChange={(e) => setBio(e.target.value)}
+                    value={bio}
                     className="w-full dark:bg-black border border-[#27272a] rounded p-2 focus:outline-none focus:ring-1 focus:ring-gray-600 min-h-[80px]"
                   />
-                </div>
+                )}
               </div>
               <div>
                 <label className="block mb-2">URLs</label>
@@ -247,65 +263,85 @@ export default function Profile() {
                 </p>
 
                 <div className="space-y-4">
-                  {/* Display existing links */}
-                  {links.length > 0 && (
-                    <div className="mb-4">
-                      <h4 className="font-medium mb-2">Your saved links:</h4>
-                      <ul className="space-y-2 ">
-                        {links.map((link, id) => (
-                          <li className="flex items-center gap-2" key={id}>
-                            <a
-                              className="hover:underline flex flex-row items-center space-x-1"
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              href={
-                                link.url.startsWith("http")
-                                  ? link.url
-                                  : `https://${link.url}`
-                              }
-                            >
-                              <span>{getLinkIcon(link.url).icon}</span>{" "}
-                              <span> {getLinkIcon(link.url).name}</span>
-                            </a>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
+                  {isloading ? (
+                    <>
+                      <Skeleton className="h-10 w-full" />
+                      <Skeleton className="h-10 w-full" />
+                    </>
+                  ) : (
+                    <>
+                      {links.length > 0 && (
+                        <div className="mb-4">
+                          <h4 className="font-medium mb-2">
+                            Your saved links:
+                          </h4>
+                          <ul className="space-y-2 ">
+                            {links.map((link, id) => (
+                              <li className="flex items-center gap-2" key={id}>
+                                <a
+                                  className="hover:underline flex flex-row items-center space-x-1"
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  href={
+                                    link.url.startsWith("http")
+                                      ? link.url
+                                      : `https://${link.url}`
+                                  }
+                                >
+                                  <span>{getLinkIcon(link.url).icon}</span>{" "}
+                                  <span> {getLinkIcon(link.url).name}</span>
+                                </a>
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
+
+                      {urlInputs.map((url, index) => (
+                        <div key={index} className="flex items-center gap-2">
+                          <span className="text-gray-500">
+                            {url ? (
+                              getLinkIcon(url).icon
+                            ) : (
+                              <LinkIcon size={16} />
+                            )}
+                          </span>
+                          <input
+                            type="text"
+                            value={url}
+                            onChange={(e) =>
+                              handleUrlChange(index, e.target.value)
+                            }
+                            className="w-full dark:bg-black border border-[#27272a] rounded p-2 focus:outline-none focus:ring-1 focus:ring-gray-600"
+                            placeholder="Instagram .."
+                          />
+                        </div>
+                      ))}
+
+                      <Button
+                        type="button"
+                        onClick={handleAddUrl}
+                        className="text-sm rounded-xl"
+                      >
+                        Add URL
+                      </Button>
+                    </>
                   )}
-
-                  {urlInputs.map((url, index) => (
-                    <div key={index} className="flex items-center gap-2">
-                      <span className="text-gray-500">
-                        {url ? getLinkIcon(url).icon : <LinkIcon size={16} />}
-                      </span>
-                      <input
-                        type="text"
-                        value={url}
-                        onChange={(e) => handleUrlChange(index, e.target.value)}
-                        className="w-full dark:bg-black border border-[#27272a] rounded p-2 focus:outline-none focus:ring-1 focus:ring-gray-600"
-                        placeholder="Instagram .."
-                      />
-                    </div>
-                  ))}
-
-                  <Button
-                    type="button"
-                    onClick={handleAddUrl}
-                    className="text-sm rounded-xl"
-                  >
-                    Add URL
-                  </Button>
                 </div>
               </div>
 
-              <Button
-                onClick={handleSubmit}
-                disabled={isposting}
-                type="button"
-                className="px-4 py-2 rounded-xl"
-              >
-                {isposting ? "Updating..." : "Update profile"}
-              </Button>
+              {isloading ? (
+                <Skeleton className="h-10 w-[120px]" />
+              ) : (
+                <Button
+                  onClick={handleSubmit}
+                  disabled={isposting}
+                  type="button"
+                  className="px-4 py-2 rounded-xl"
+                >
+                  {isposting ? "Updating..." : "Update profile"}
+                </Button>
+              )}
             </div>
           </div>
         )}

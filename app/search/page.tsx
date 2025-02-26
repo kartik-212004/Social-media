@@ -9,6 +9,7 @@ import { useRouter } from "next/navigation";
 export default function Explore() {
   const [search, setSearch] = useState("");
   const [names, setNames] = useState<{ id: string; name: string }[]>([]);
+  const [suggestedUsers, setSuggestedUsers] = useState<{ id: string; name: string }[]>([]);
   const router = useRouter();
 
   useEffect(() => {
@@ -18,14 +19,17 @@ export default function Explore() {
   const fetchUsers = async () => {
     try {
       const response = await axios.get("/api/search");
-      setNames(response.data.Users);
+      const users = response.data.Users;
+      setNames(users);
+      // Shuffle users and select up to 34 for suggestions
+      const shuffled = [...users].sort(() => 0.5 - Math.random());
+      setSuggestedUsers(shuffled.slice(0, 34));
     } catch (error) {
       console.error(error);
     }
   };
 
   function userDashboard(id: string) {
-    console.log(id);
     router.push(`/dashboard/?id=${id}`);
   }
 
@@ -37,7 +41,7 @@ export default function Explore() {
         );
 
   return (
-    <div className="py-16 h-screen w-[60%] dark:border-zinc-800 border-l-2">
+    <div className="py-16 h-screen w-[60%] dark:border-zinc-800 border-x-2">
       <div className="flex flex-row items-center justify-center space-x-2">
         <Search />
         <input
@@ -48,27 +52,38 @@ export default function Explore() {
       </div>
       <div className="flex flex-row my-4 justify-center">
         <ul className="w-[60%] space-y-2 list-none">
-          {filteredNames.length > 0 ? (
-            filteredNames.map((user) => (
+          {search.trim() !== "" ? (
+            filteredNames.length > 0 ? (
+              filteredNames.map((user) => (
+                <li
+                  onClick={() => userDashboard(user.id)}
+                  className="h-10 px-3 py-2 flex flex-row justify-between hover:bg-gray-200 border border-gray-200 dark:border-gray-800 dark:hover:bg-[#222121] dark:bg-[#0f0f0f] rounded-2xl"
+                  key={user.id}
+                >
+                  {user.name}
+                  <span>
+                    <UserCheck2 />
+                  </span>
+                </li>
+              ))
+            ) : (
+              <p>No users found</p>
+            )
+          ) : suggestedUsers.length > 0 ? (
+            suggestedUsers.map((user) => (
               <li
-                onClick={() => {
-                  userDashboard(user.id);
-                }}
+                onClick={() => userDashboard(user.id)}
                 className="h-10 px-3 py-2 flex flex-row justify-between hover:bg-gray-200 border border-gray-200 dark:border-gray-800 dark:hover:bg-[#222121] dark:bg-[#0f0f0f] rounded-2xl"
                 key={user.id}
               >
-                {user.name}{" "}
+                {user.name}
                 <span>
                   <UserCheck2 />
                 </span>
               </li>
             ))
           ) : (
-            <p>
-              {search.trim() === ""
-                ? "Start typing to search..."
-                : "No users found"}
-            </p>
+            <p>No suggestions available</p>
           )}
         </ul>
       </div>
