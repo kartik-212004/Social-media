@@ -86,10 +86,10 @@ export default function Account() {
       setIsNameEditable(false);
       return toast({ title: "Please enter a new name" });
     }
-
+    const modifiedName = username[0].toUpperCase() + username.slice(1);
     try {
       await axios.patch("/api/settings/change-name", {
-        name: username,
+        name: modifiedName,
         email: session?.user?.email,
       });
       await update();

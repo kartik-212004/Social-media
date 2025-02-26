@@ -16,7 +16,6 @@ export async function POST(req: NextRequest) {
   const { searchParams } = new URL(req.url);
   const id = searchParams.get("id");
 
-  console.log(id);
   try {
     const { email } = await req.json();
 

@@ -15,7 +15,6 @@ export async function POST(req: NextRequest) {
   const { email, password, name } = data;
   try {
     if (!result.success) {
-      console.log(result.error.issues[0].message);
       return NextResponse.json(
         { message: result.error.issues[0].message },
         { status: 400 }

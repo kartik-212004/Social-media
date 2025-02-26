@@ -19,7 +19,9 @@ model user {
   name      String?
   password  String?
   createdAt DateTime @default(now())
+  bio       String?
   post      Post[]
+  link      Link[]
   imageName String?
 }
 
@@ -32,4 +34,11 @@ model Post {
   user      user?    @relation(fields: [userId], references: [id])
   postName  String?
   userId    String?
+}
+
+model Link {
+  id     String  @id @default(uuid())
+  url    String  @unique
+  user   user?   @relation(fields: [userId], references: [id])
+  userId String?
 }

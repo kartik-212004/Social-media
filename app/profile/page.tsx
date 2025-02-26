@@ -4,17 +4,34 @@ import { useState, useEffect } from "react";
 import { useProfileImage } from "@/hooks/useProfileImage";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Skeleton } from "@/components/ui/skeleton";
 import { useSession } from "next-auth/react";
+import axios from "axios";
+import {
+  Globe,
+  Github,
+  Twitter,
+  Linkedin,
+  Instagram,
+  Facebook,
+  Youtube,
+  Dribbble,
+  Link as LinkIcon,
+} from "lucide-react";
 
 export default function Profile() {
   const [activeTab, setActiveTab] = useState<"dashboard" | "settings">(
     "dashboard"
   );
-  const [bio, setBio] = useState("I own a computer.");
-  const [urls, setUrls] = useState([
-    "https://shadcn.com",
-    "http://twitter.com/shadcn",
-  ]);
+  const [bio, setBio] = useState("");
+  const [urlInputs, setUrlInputs] = useState<string[]>([""]);
+  const [isposting, setisposting] = useState(false);
+  const [links, setLinks] = useState<
+    { id: string; url: string; userId: string }[]
+  >([]);
+
+  const [fetchedBio, setfetchedBio] = useState("");
+  const [isloading, setisloading] = useState(false);
 
   const { imageUrl: profileImageUrl, refetchImage } = useProfileImage();
   const { data: session } = useSession();
@@ -24,17 +41,114 @@ export default function Profile() {
   }, [refetchImage]);
 
   const handleAddUrl = () => {
-    setUrls([...urls, ""]);
+    setUrlInputs([...urlInputs, ""]);
   };
 
   const handleUrlChange = (index: number, value: string) => {
-    const updatedUrls = [...urls];
-    updatedUrls[index] = value;
-    setUrls(updatedUrls);
+    const newUrlInputs = [...urlInputs];
+    newUrlInputs[index] = value;
+    setUrlInputs(newUrlInputs);
+  };
+
+  const getLinkIcon = (url: string) => {
+    const domain = url.toLowerCase();
+
+    if (domain.includes("github.com"))
+      return { icon: <Github size={16} />, name: "Github" };
+    if (domain.includes("twitter.com") || domain.includes("x.com"))
+      return { icon: <Twitter size={16} />, name: "Twitter" };
+    if (domain.includes("linkedin.com"))
+      return { icon: <Linkedin size={16} />, name: "Linkedin" };
+    if (domain.includes("instagram.com"))
+      return { icon: <Instagram size={16} />, name: "Instagram" };
+    if (domain.includes("facebook.com"))
+      return { icon: <Facebook size={16} />, name: "Facebook" };
+    if (domain.includes("youtube.com"))
+      return { icon: <Youtube size={16} />, name: "Youtube" };
+    if (domain.includes("dribbble.com"))
+      return { icon: <Dribbble size={16} />, name: "Dribbble" };
+
+    return { icon: <Globe size={16} />, name: "Link" };
+  };
+
+  // backend request
+  const handleSubmit = async () => {
+    console.log(bio, urlInputs);
+    setisposting(true);
+    try {
+      const newLinks = urlInputs.filter((url) => url.trim() !== "");
+
+      const response = await axios.post("/api/settings/profile-update", {
+        bio: bio,
+        links: newLinks,
+        email: session?.user?.email,
+      });
+      const data = await response.data;
+      console.log(data);
+      setisposting(false);
+      fetchData();
+    } catch (error) {
+      console.log(error);
+      setisposting(false);
+    }
+  };
+
+  // fetch from backend
+  const fetchData = async () => {
+    setisloading(true);
+    if (!session?.user?.email) {
+      setisloading(false);
+      return;
+    }
+
+    try {
+      const response = await axios.get(
+        `/api/settings/profile-update?email=${session?.user?.email}`
+      );
+      const data = response.data;
+      console.log(data);
+      setfetchedBio(data.bio || "");
+      setBio(data.bio || "");
+      setLinks(data.links || []);
+
+      setUrlInputs([""]);
+    } catch (error) {
+      console.error("Error fetching profile data:", error);
+    } finally {
+      setisloading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (session?.user?.email) {
+      fetchData();
+    }
+  }, [session?.user?.email]);
+
+  const Links = () => {
+    return (
+      <ul className="space-y-2">
+        {links.map((link, id) => (
+          <li className="flex items-center gap-2" key={id}>
+            <a
+              className="hover:underline flex flex-row items-center space-x-1"
+              target="_blank"
+              rel="noopener noreferrer"
+              href={
+                link.url.startsWith("http") ? link.url : `https://${link.url}`
+              }
+            >
+              <span>{getLinkIcon(link.url).icon}</span>{" "}
+              <span> {getLinkIcon(link.url).name}</span>
+            </a>
+          </li>
+        ))}
+      </ul>
+    );
   };
 
   return (
-    <div className="min-h-screen w-2/3  p-6">
+    <div className="min-h-screen w-2/3 dark:border-zinc-800 border-l-2 p-6">
       <div className="w-full mb-8">
         <div className="flex">
           <button
@@ -47,7 +161,6 @@ export default function Profile() {
                   ? "border-b-2 border-black dark:border-white"
                   : "border-b-2 border-transparent"
               }`}
-              onClick={() => setActiveTab("dashboard")}
             >
               Profile Dashboard
             </span>
@@ -79,93 +192,119 @@ export default function Profile() {
                   className="object-cover"
                   src={profileImageUrl || undefined}
                 />
-                <AvatarFallback className="text-2xl">Dawg</AvatarFallback>
+                <AvatarFallback className="text-2xl">
+                  {session?.user?.name?.[0] || "U"}
+                </AvatarFallback>
               </Avatar>
               <div className="flex flex-col space-y-3 justify-center">
-                <h2 className="text-2xl font-semibold">
+                <h2 className="text-xl font-semibold">
                   {session?.user?.name || "username"}
                   <p className="text-lg">{session?.user?.email}</p>
                 </h2>
-                <div className="mt-4">
-                  <h3 className="text-lg font-medium ">Bio</h3>
-                  <p>{bio}</p>
-                </div>
               </div>
             </div>
 
             <div className="mt-10">
-              <h3 className="text-lg font-medium mb-3">Links</h3>
-              <ul className="space-y-2">
-                {urls.map((url, index) => (
-                  <li key={index}>
-                    <a
-                      href={url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-blue-400 hover:text-blue-300"
-                    >
-                      {url}
-                    </a>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </div>
-        )}
-
-        {/* Profile Settings Content */}
-        {activeTab === "settings" && (
-          <div className="p-8 rounded-lg">
-            <h1 className="text-xl font-bold mb-1">Profile Settings</h1>
-            <p className=" text-sm mb-6">
-              This is how others will see you on the site.
-            </p>
-
-            <hr className="border-[#27272a] my-4" />
-
-            <div className="space-y-8">
               <div>
-                <label htmlFor="bio" className="block  mb-2">
+                <label htmlFor="bio" className="block mb-2">
                   Bio
                 </label>
                 <div className="relative">
                   <textarea
                     id="bio"
-                    value={bio}
+                    value={fetchedBio}
+                    disabled={true}
+                    className="w-full dark:bg-background border border-[#27272a] rounded p-2 focus:outline-none focus:ring-1 focus:ring-gray-600 min-h-[80px]"
+                  />
+                </div>
+              </div>
+              <h3 className="text-lg font-medium mb-3 mt-6">Links</h3>
+              {isloading ? <Skeleton className="h-20 w-full" /> : <Links />}
+            </div>
+          </div>
+        )}
+
+        {activeTab === "settings" && (
+          <div className="p-8 rounded-lg">
+            <h1 className="text-xl font-bold mb-1">Profile Settings</h1>
+            <div className="space-y-8">
+              <div>
+                <label htmlFor="bioEdit" className="block mb-2">
+                  Bio
+                </label>
+                <div className="relative">
+                  <textarea
+                    id="bioEdit"
                     onChange={(e) => setBio(e.target.value)}
-                    className="w-full dark:bg-black border border-[#27272a] rounded p-2  focus:outline-none focus:ring-1 focus:ring-gray-600 min-h-[80px]"
+                    className="w-full dark:bg-black border border-[#27272a] rounded p-2 focus:outline-none focus:ring-1 focus:ring-gray-600 min-h-[80px]"
                   />
                 </div>
               </div>
               <div>
-                <label className="block  mb-2">URLs</label>
-                <p className=" text-sm mb-2">
+                <label className="block mb-2">URLs</label>
+                <p className="text-sm mb-2">
                   Add links to your website, blog, or social media profiles.
                 </p>
 
-                <div className="space-y-2">
-                  {urls.map((url, index) => (
-                    <input
-                      key={index}
-                      type="text"
-                      value={url}
-                      onChange={(e) => handleUrlChange(index, e.target.value)}
-                      className="w-full dark:bg-black border border-[#27272a] rounded p-2  focus:outline-none focus:ring-1 focus:ring-gray-600"
-                    />
+                <div className="space-y-4">
+                  {/* Display existing links */}
+                  {links.length > 0 && (
+                    <div className="mb-4">
+                      <h4 className="font-medium mb-2">Your saved links:</h4>
+                      <ul className="space-y-2 ">
+                        {links.map((link, id) => (
+                          <li className="flex items-center gap-2" key={id}>
+                            <a
+                              className="hover:underline flex flex-row items-center space-x-1"
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              href={
+                                link.url.startsWith("http")
+                                  ? link.url
+                                  : `https://${link.url}`
+                              }
+                            >
+                              <span>{getLinkIcon(link.url).icon}</span>{" "}
+                              <span> {getLinkIcon(link.url).name}</span>
+                            </a>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+
+                  {urlInputs.map((url, index) => (
+                    <div key={index} className="flex items-center gap-2">
+                      <span className="text-gray-500">
+                        {url ? getLinkIcon(url).icon : <LinkIcon size={16} />}
+                      </span>
+                      <input
+                        type="text"
+                        value={url}
+                        onChange={(e) => handleUrlChange(index, e.target.value)}
+                        className="w-full dark:bg-black border border-[#27272a] rounded p-2 focus:outline-none focus:ring-1 focus:ring-gray-600"
+                        placeholder="Instagram .."
+                      />
+                    </div>
                   ))}
 
-                  <button
+                  <Button
                     type="button"
                     onClick={handleAddUrl}
-                    className="mt-2 px-3 py-1 text-sm dark:bg-black border border-gray-700 rounded hover:bg-gray-900 focus:outline-none"
+                    className="text-sm rounded-xl"
                   >
                     Add URL
-                  </button>
+                  </Button>
                 </div>
               </div>
 
-              <Button type="button" className="px-4 py-2 rounded-xl">
-                Update profile
+              <Button
+                onClick={handleSubmit}
+                disabled={isposting}
+                type="button"
+                className="px-4 py-2 rounded-xl"
+              >
+                {isposting ? "Updating..." : "Update profile"}
               </Button>
             </div>
           </div>

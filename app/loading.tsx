@@ -1,7 +1,7 @@
 import { Skeleton } from "@/components/ui/skeleton";
 export default function Loading() {
   const renderPostSkeleton = () => (
-    <div className="p-4 px-6 animate-pulse flex items-start space-x-4">
+    <div className="p-4  px-6 animate-pulse flex items-start space-x-4">
       <Skeleton className="h-10 w-10 rounded-full mt-2" />
       <div className="flex-1">
         <div className="flex items-center py-2 space-x-2">

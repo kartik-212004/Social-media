@@ -11,6 +11,7 @@ import {
   User,
   Settings,
 } from "lucide-react";
+import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 
 import {
   DropdownMenu,
@@ -21,7 +22,7 @@ import {
 
 const sidebarData = [
   { name: "Home", icon: <HomeIcon />, Link: "/" },
-  { name: "Explore", icon: <Search />, Link: "/explore" },
+  { name: "Search", icon: <Search />, Link: "/search" },
   { name: "Notifications", icon: <BellRing />, Link: "/notification" },
   { name: "Messages", icon: <MessageCircle />, Link: "/message" },
   { name: "Account", icon: <Settings />, Link: "/account" },
@@ -29,7 +30,6 @@ const sidebarData = [
   ,
 ];
 
-import noProfile from "../public/image.png";
 import { useToast } from "@/hooks/use-toast";
 import { useTheme } from "next-themes";
 import { useProfileImage } from "@/hooks/useProfileImage";
@@ -75,7 +75,7 @@ export default function Sidebar() {
     }
   }
 
-  return  (
+  return (
     <div className="w-1/3 flex flex-col justify-end items-end">
       <div className="py-6 top-0  fixed pr-10 flex flex-col min-h-screen justify-between items-end">
         <ul className="space-y-2 ">
@@ -107,13 +107,23 @@ export default function Sidebar() {
           <DropdownMenuTrigger>
             <div className="flex flex-row justify-center min-w-min hover:bg-zinc-100 dark:hover:bg-zinc-900 px-3 py-3 rounded-full items-center">
               <div className="flex items-center gap-3">
-                <img
+                <Avatar>
+                  <AvatarImage
+                    width={40}
+                    height={40}
+                    className="w-10 h-10 object-cover rounded-full"
+                    src={imageUrl}
+                    alt="Profile"
+                  ></AvatarImage>
+                  <AvatarFallback>KB</AvatarFallback>
+                </Avatar>
+                {/* <img
                   width={40}
                   height={40}
                   className="w-10 h-10 object-cover rounded-full"
                   src={imageUrl || noProfile}
                   alt="Profile"
-                />
+                /> */}
                 <div className="flex flex-col items-start ">
                   <span className="font-semibold">{data?.user?.name}</span>
                   <span className="text-sm">{data?.user?.email}</span>

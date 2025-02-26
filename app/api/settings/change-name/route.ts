@@ -3,7 +3,6 @@ import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 export async function PATCH(req: NextRequest) {
   const { name, email } = await req.json();
-  console.log(name, email);
   const modifiedName = await prisma.user.update({
     where: { email: email },
     data: { name: name },

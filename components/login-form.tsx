@@ -32,7 +32,6 @@ export function LoginForm({
       router.push("/");
     } else {
       toast({ title: handle?.error || "Incorrect Password" });
-      console.log(handle);
     }
   }
   async function githubHandle(e: React.FormEvent) {

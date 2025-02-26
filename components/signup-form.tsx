@@ -31,11 +31,13 @@ export function SignUpForm({
 
   async function loginHandler(e: React.FormEvent) {
     e.preventDefault();
+
+    const ModifiedName = name[0].toUpperCase() + name.slice(1);
     try {
       const handle = await axios.post("http://localhost:3000/api/signup", {
         email: email,
         password: password,
-        name: name,
+        name: ModifiedName,
       });
       if (handle.status === 200) successToast(handle.data.message);
       router.push("/signin");
@@ -70,7 +72,6 @@ export function SignUpForm({
       className={cn("flex flex-col gap-6", className)}
       {...props}
     >
-      {/* <ToastContainer theme={theme} /> */}
       <div className="flex flex-col items-center gap-2 text-center">
         <h1 className="text-2xl font-bold">Create your account</h1>
         <p className="text-balance text-sm text-neutral-500 dark:text-neutral-400">

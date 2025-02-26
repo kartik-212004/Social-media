@@ -13,7 +13,6 @@ export async function DELETE(
   { params }: { params: { email: string } }
 ) {
   const { email } =  params;
-  console.log("Received Email:", email);
 
   await s3Client.send(
     new DeleteObjectCommand({
