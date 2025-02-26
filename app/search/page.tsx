@@ -26,7 +26,7 @@ export default function Explore() {
 
   function userDashboard(id: string) {
     console.log(id);
-    router.push("/");
+    router.push(`/dashboard/?id=${id}`);
   }
 
   const filteredNames =
@@ -54,7 +54,7 @@ export default function Explore() {
                 onClick={() => {
                   userDashboard(user.id);
                 }}
-                className="h-10 px-3 py-2 flex flex-row justify-between hover:bg-gray-200 border border-gray-200 dark:hover:bg-[#222121] dark:bg-[#0f0f0f] rounded-2xl"
+                className="h-10 px-3 py-2 flex flex-row justify-between hover:bg-gray-200 border border-gray-200 dark:border-gray-800 dark:hover:bg-[#222121] dark:bg-[#0f0f0f] rounded-2xl"
                 key={user.id}
               >
                 {user.name}{" "}
