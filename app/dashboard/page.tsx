@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { useSearchParams } from "next/navigation";
 import Loading from "../loading";
-import { useProfileImage } from "@/hooks/useProfileImage";
+import { useUserImage } from "@/hooks/useAwsImage";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { formatDistanceToNow } from "date-fns";
 
@@ -23,15 +23,19 @@ export default function Dashboard() {
     email: string;
   };
 
-  const { imageUrl } = useProfileImage();
   const [user, setUser] = useState<User | null>(null);
   const [posts, setPosts] = useState<Post[]>([]);
   const searchParams = useSearchParams();
   const userId = searchParams.get("id");
+  const { imageUrlAvatar, error } = useUserImage({ id: userId || "" });
 
   useEffect(() => {
     fetchUser();
   }, []);
+
+  useEffect(() => {
+    if (userId) fetchUser();
+  }, [userId]);
 
   const fetchUser = async () => {
     try {
@@ -59,6 +63,9 @@ export default function Dashboard() {
     }
   };
 
+  if (error?.message == "Request failed with status code 404") {
+  }
+
   if (!user)
     return (
       <div className="p-16 w-2/3">
@@ -72,7 +79,7 @@ export default function Dashboard() {
         <div className="flex flex-col h-min justify-center pb-6 border-b dark:border-zinc-800 mb-6">
           <div className="flex items-center gap-4">
             <Avatar>
-              <AvatarImage src={imageUrl}></AvatarImage>
+              <AvatarImage src={imageUrlAvatar || ""}></AvatarImage>
               <AvatarFallback>kb</AvatarFallback>
             </Avatar>
             <div>
@@ -98,10 +105,11 @@ export default function Dashboard() {
               key={post.id}
               className="p-4 hover:bg-zinc-100 dark:hover:bg-zinc-900 rounded-xl transition-colors duration-200 group"
             >
-              {/* Post Header */}
               <div className="flex items-center gap-3 mb-2">
                 <Avatar>
-                  <AvatarImage src={imageUrl}></AvatarImage>
+                  <AvatarImage
+                    src={imageUrlAvatar ? imageUrlAvatar : ""}
+                  ></AvatarImage>
                   <AvatarFallback>kb</AvatarFallback>
                 </Avatar>
                 <div>

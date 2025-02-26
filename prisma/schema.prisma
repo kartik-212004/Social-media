@@ -23,6 +23,7 @@ model user {
   post      Post[]
   link      Link[]
   imageName String?
+  imageUrl  String?
 }
 
 model Post {

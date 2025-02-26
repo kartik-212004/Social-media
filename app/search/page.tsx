@@ -21,7 +21,6 @@ export default function Explore() {
       const response = await axios.get("/api/search");
       const users = response.data.Users;
       setNames(users);
-      // Shuffle users and select up to 34 for suggestions
       const shuffled = [...users].sort(() => 0.5 - Math.random());
       setSuggestedUsers(shuffled.slice(0, 34));
     } catch (error) {

@@ -7,6 +7,7 @@ import { useToast } from "@/hooks/use-toast";
 import axios from "axios";
 import { Input } from "./ui/input";
 import { useProfileImage } from "@/hooks/useProfileImage";
+// import { useUserImage } from "@/hooks/useAwsImage";
 
 type Post = {
   id: string;
@@ -157,7 +158,11 @@ export default function Middlebar() {
         className="p-4 px-6 hover:bg-zinc-100 dark:hover:bg-[#070707] transition-colors duration-200 flex items-start space-x-4"
       >
         <Avatar className="mt-2">
-          <AvatarImage src={post.user?.image || ""} alt="User Avatar" />
+          <AvatarImage
+            key={post.id}
+            src={post.user?.image || ""}
+            alt="User Avatar"
+          />
           <AvatarFallback>
             <Camera />
           </AvatarFallback>

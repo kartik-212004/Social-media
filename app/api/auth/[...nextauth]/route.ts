@@ -88,6 +88,7 @@ const handler = NextAuth({
               email: user.email,
               name: user.name,
               password: null,
+              imageUrl: user.image,
             },
           });
         }
