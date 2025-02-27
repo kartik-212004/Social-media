@@ -37,9 +37,7 @@ export async function POST(req: NextRequest) {
         select: { imageName: true, imageUrl: true },
       });
     }
-
-    console.log("User found:", user);
-
+    
     if (!user) {
       return NextResponse.json(
         { message: "User not found", status: 404 },

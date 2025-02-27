@@ -72,7 +72,6 @@ export default function Profile() {
 
   // backend request
   const handleSubmit = async () => {
-    console.log(bio, urlInputs);
     setisposting(true);
     try {
       const newLinks = urlInputs.filter((url) => url.trim() !== "");
@@ -82,8 +81,7 @@ export default function Profile() {
         links: newLinks,
         email: session?.user?.email,
       });
-      const data = await response.data;
-      console.log(data);
+      await response.data;
       setisposting(false);
       fetchData();
     } catch (error) {
@@ -105,7 +103,6 @@ export default function Profile() {
         `/api/settings/profile-update?email=${session?.user?.email}`
       );
       const data = response.data;
-      console.log(data);
       setfetchedBio(data.bio || "");
       setBio(data.bio || "");
       setLinks(data.links || []);

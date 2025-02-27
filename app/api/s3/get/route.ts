@@ -20,7 +20,6 @@ export async function POST(req: NextRequest) {
     const { email } = await req.json();
 
     const searchCriteria = id ? { id } : email ? { email } : null;
-    console.log(searchCriteria, "hello");
 
     if (!searchCriteria) {
       return NextResponse.json(

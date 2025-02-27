@@ -5,7 +5,6 @@ const prisma = new PrismaClient();
 export async function POST(req: NextRequest) {
   try {
     const { bio, links, email } = await req.json();
-    console.log(bio, links);
 
     if (!bio && (!links || links.length === 0)) {
       return NextResponse.json({ message: "Nothing To Update" });
@@ -15,7 +14,6 @@ export async function POST(req: NextRequest) {
       where: { email: email },
       select: { id: true },
     });
-    console.log(userId, "id");
 
     if (!userId) return NextResponse.json({ message: "No User Found" });
 
@@ -35,10 +33,8 @@ export async function POST(req: NextRequest) {
         data: { bio: bio },
       });
     }
-    console.log("success");
     return NextResponse.json({ message: "Updated successfully" });
   } catch (error) {
-    console.log(error);
     return NextResponse.json(
       { message: "Error updating user", error: error },
       { status: 500 }
