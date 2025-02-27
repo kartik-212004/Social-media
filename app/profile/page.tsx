@@ -191,7 +191,7 @@ export default function Profile() {
               ) : (
                 <Avatar className="w-32 h-32">
                   <AvatarImage
-                    className="object-cover"
+                    className="object-cover object-top"
                     src={profileImageUrl || undefined}
                   />
                   <AvatarFallback className="text-2xl">
@@ -226,7 +226,7 @@ export default function Profile() {
                     id="bio"
                     value={fetchedBio}
                     disabled={true}
-                    className="w-full dark:bg-background border border-[#27272a] rounded p-2 focus:outline-none focus:ring-1 focus:ring-gray-600 min-h-[80px]"
+                    className="w-full hover:cursor-not-allowed dark:bg-background border border-[#27272a] rounded p-2 focus:outline-none focus:ring-1 focus:ring-gray-600 min-h-[80px]"
                   />
                 )}
               </div>

@@ -15,6 +15,7 @@ export async function POST(req: NextRequest) {
       where: { email: email },
       select: { id: true },
     });
+    console.log(userId, "id");
 
     if (!userId) return NextResponse.json({ message: "No User Found" });
 
@@ -31,15 +32,15 @@ export async function POST(req: NextRequest) {
     if (bio) {
       await prisma.user.update({
         where: { id: userId.id },
-        data: { bio },
+        data: { bio: bio },
       });
     }
-
+    console.log("success");
     return NextResponse.json({ message: "Updated successfully" });
   } catch (error) {
-    console.error("Error updating user:", error);
+    console.log(error);
     return NextResponse.json(
-      { message: "Error updating user", error },
+      { message: "Error updating user", error: error },
       { status: 500 }
     );
   }

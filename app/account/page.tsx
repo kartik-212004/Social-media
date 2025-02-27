@@ -177,7 +177,9 @@ export default function Account() {
               <Avatar className="w-40 h-40">
                 <AvatarImage
                   src={profileImageUrl}
-                  className={isUploading ? "opacity-50" : "object-cover"}
+                  className={
+                    isUploading ? "opacity-50" : "object-cover object-top"
+                  }
                   alt="User Avatar"
                 />
                 <AvatarFallback className="bg-gray-100">
