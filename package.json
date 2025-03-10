@@ -2,10 +2,11 @@
   "name": "social-media",
   "version": "0.1.0",
   "private": true,
+  "type": "module",
   "scripts": {
-    "dev": "next dev",
+    "dev": "concurrently \"node app/server/socket.js\" \"next dev\"",
     "build": "next build",
-    "start": "next start",
+    "start": "concurrently \"node app/server/socket.js\" \"next start\"",
     "lint": "next lint"
   },
   "dependencies": {
@@ -24,6 +25,7 @@
     "@types/next-auth": "^3.13.0",
     "@types/nodemailer": "^6.4.17",
     "@types/react-toastify": "^4.0.2",
+    "@types/ws": "^8.18.0",
     "axios": "^1.7.9",
     "bcrypt": "^5.1.1",
     "class-variance-authority": "^0.7.1",
@@ -44,6 +46,7 @@
     "react-dropzone": "^14.3.5",
     "tailwind-merge": "^2.6.0",
     "tailwindcss-animate": "^1.0.7",
+    "ws": "^8.18.1",
     "zod": "^3.24.1",
     "zustand": "^5.0.3"
   },
@@ -53,6 +56,7 @@
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "concurrently": "^9.1.2",
     "eslint": "^9",
     "eslint-config-next": "15.1.6",
     "postcss": "^8",
