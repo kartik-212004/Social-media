@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useSession } from "next-auth/react";
+import { Popcorn } from "lucide-react";
 import axios from "axios";
 import {
   Globe,
@@ -58,6 +59,8 @@ export default function Profile() {
       return { icon: <Twitter size={16} />, name: "Twitter" };
     if (domain.includes("linkedin.com"))
       return { icon: <Linkedin size={16} />, name: "Linkedin" };
+    if (domain.includes("pornhub.com"))
+      return { icon: <Popcorn size={16} />, name: "Pornhub" };
     if (domain.includes("instagram.com"))
       return { icon: <Instagram size={16} />, name: "Instagram" };
     if (domain.includes("facebook.com"))
