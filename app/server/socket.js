@@ -45,7 +45,6 @@ wss.on('connection', function connection(ws) {
   });
 });
 
-// Simple endpoint to check if server is running
 app.get('/', (req, res) => {
   res.send('WebSocket server is running');
 });
