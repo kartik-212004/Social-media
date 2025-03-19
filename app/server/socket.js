@@ -1,4 +1,5 @@
 import { WebSocketServer } from "ws";
+import { WebSocket } from "ws";
 
 const wss = new WebSocketServer({ port: 8080 });
 let clientCount = 0;
@@ -7,18 +8,21 @@ wss.on("connection", function connection(ws) {
   clientCount++;
   console.log(`Client connected: ${clientCount}`);
 
-  // Send updated client count to all clients
   broadcastClientCount();
 
   ws.on("message", function message(data) {
-    console.log("Received:", data.toString());
+    try {
+      const messageData = JSON.parse(data.toString());
+      console.log("Received:", messageData);
 
-    // Broadcast received message to all clients
-    wss.clients.forEach((client) => {
-      if (client.readyState === WebSocket.OPEN) {
-        client.send(data.toString());
-      }
-    });
+      wss.clients.forEach((client) => {
+        if (client.readyState === WebSocket.OPEN) {
+          client.send(JSON.stringify(messageData));
+        }
+      });
+    } catch (error) {
+      console.error("Error processing message:", error);
+    }
   });
 
   ws.on("close", () => {

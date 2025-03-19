@@ -4,37 +4,69 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useSession } from "next-auth/react";
 
-const ThemeCompatibleMessaging: React.FC = () => {
+const Message: React.FC = () => {
+  const [clientCount, setClientCount] = useState<number>(0);
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState<
     { sender: string; text: string; time: string }[]
   >([]);
+  const [connectionStatus, setConnectionStatus] = useState<string>("connecting");
   const socketRef = useRef<WebSocket | null>(null);
   const session = useSession();
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
-
+  
   useEffect(() => {
-    socketRef.current = new WebSocket("ws://localhost:8080");
-
-    socketRef.current.onopen = () => {
-      console.log("Connected to WebSocket");
+    const connectWebSocket = () => {
+      try {
+        setConnectionStatus("connecting");
+        socketRef.current = new WebSocket("ws://localhost:8080");
+  
+        socketRef.current.onopen = () => {
+          console.log("Connected to WebSocket");
+          setConnectionStatus("connected");
+        };
+  
+        socketRef.current.onmessage = (event) => {
+          try {
+            const data = JSON.parse(event.data);
+            console.log("Received data:", data);
+            
+            if (data.type === "clientCount") {
+              console.log("Setting client count:", data.count);
+              setClientCount(data.count);
+            } else if (data.sender && data.text) {
+              setMessages((prev) => [...prev, data]);
+            }
+          } catch (error) {
+            console.error("Error parsing WebSocket message:", event.data, error);
+          }
+        };
+  
+        socketRef.current.onerror = (error) => {
+          console.error("WebSocket error:", error);
+          setConnectionStatus("error");
+        };
+  
+        socketRef.current.onclose = () => {
+          console.log("WebSocket disconnected");
+          setConnectionStatus("disconnected");
+          
+          setTimeout(connectWebSocket, 5000);
+        };
+      } catch (error) {
+        console.error("Failed to create WebSocket connection:", error);
+        setConnectionStatus("error");
+        
+        setTimeout(connectWebSocket, 5000);
+      }
     };
-
-    socketRef.current.onmessage = (event) => {
-      const newMessage = JSON.parse(event.data);
-      setMessages((prev) => [...prev, newMessage]);
-    };
-
-    socketRef.current.onerror = (error) => {
-      console.error("WebSocket error:", error);
-    };
-
-    socketRef.current.onclose = () => {
-      console.log("WebSocket disconnected");
-    };
-
+    
+    connectWebSocket();
+    
     return () => {
-      socketRef.current?.close();
+      if (socketRef.current) {
+        socketRef.current.close();
+      }
     };
   }, []);
 
@@ -43,7 +75,7 @@ const ThemeCompatibleMessaging: React.FC = () => {
   }, [messages]);
 
   const handleSendMessage = () => {
-    if (session.data?.user?.name && message.trim() && socketRef.current) {
+    if (session.data?.user?.name && message.trim() && socketRef.current && socketRef.current.readyState === WebSocket.OPEN) {
       const newMessage = {
         sender: session.data.user.name,
         text: message,
@@ -63,11 +95,22 @@ const ThemeCompatibleMessaging: React.FC = () => {
   return (
     <div className="flex h-screen bg-background text-foreground">
       <div className="flex-1 dark:border-zinc-800 border-x-2 flex flex-col">
-        <div className="p-4 border-b border-zinc-800 flex items-center bg-card">
-          <div className="h-8 w-8 rounded-full bg-blue-500 flex items-center justify-center text-white font-bold mr-2">
-            {session.data?.user?.name?.[0] || "C"}
+        <div className="p-4 border-b border-zinc-800 flex items-center justify-between bg-card">
+          <div className="flex items-center">
+            <div className="h-8 w-8 rounded-full bg-blue-500 flex items-center justify-center text-white font-bold mr-2">
+              {session.data?.user?.name?.[0] || "C"}
+            </div>
+            <p className="font-medium">Chat</p>
           </div>
-          <p className="font-medium">Chat</p>
+          <div className="flex items-center">
+            <span className={`inline-block w-2 h-2 rounded-full mr-2 ${
+              connectionStatus === "connected" ? "bg-green-500" : 
+              connectionStatus === "connecting" ? "bg-yellow-500" : "bg-red-500"
+            }`}></span>
+            <span className="text-sm text-muted-foreground">
+              {clientCount > 0 ? `${clientCount} online` : "No users online"}
+            </span>
+          </div>
         </div>
 
         <div className="flex-1 overflow-y-auto p-4 flex flex-col justify-end">
@@ -106,7 +149,7 @@ const ThemeCompatibleMessaging: React.FC = () => {
                         : ""
                     }`}
                   >
-                    {/* {msg.time} */}
+                    {msg.time}
                   </div>
                 </div>
               </div>
@@ -127,7 +170,7 @@ const ThemeCompatibleMessaging: React.FC = () => {
           <Button
             onClick={handleSendMessage}
             className="ml-2 rounded-full h-10 w-10 p-0 flex items-center justify-center bg-blue-500 hover:bg-blue-600 text-white"
-            disabled={!message.trim()}
+            disabled={!message.trim() || connectionStatus !== "connected"}
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -150,4 +193,4 @@ const ThemeCompatibleMessaging: React.FC = () => {
   );
 };
 
-export default ThemeCompatibleMessaging;
+export default Message;
