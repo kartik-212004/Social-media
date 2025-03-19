@@ -1,5 +1,33 @@
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
+# Social Media Application
+
+## Optimized Avatar Loading
+
+The application uses a batch processing approach to efficiently load user avatars:
+
+```
+┌────────────────┐      ┌───────────────────┐     ┌──────────────────┐
+│                │      │                   │     │                  │
+│  Load Posts    │──►   │ Extract Unique    │──►  │ Batch Request    │
+│                │      │ User IDs          │     │ for Avatars      │
+└────────────────┘      └───────────────────┘     └──────────────────┘
+                                                           │
+                                                           ▼
+┌────────────────┐      ┌───────────────────┐     ┌──────────────────┐
+│                │      │                   │     │                  │
+│  Render Posts  │◄──   │ Update Posts with │◄──  │ Process Avatar   │
+│  with Avatars  │      │ Avatar URLs       │     │ URLs from S3     │
+└────────────────┘      └───────────────────┘     └──────────────────┘
+```
+
+### Benefits:
+
+1. **Reduced API Calls**: Instead of making one request per avatar, we batch process all needed avatars in a single API call
+2. **Improved Performance**: Fewer network requests mean faster page loading times
+3. **Caching**: We track which avatars we've already loaded to prevent duplicate requests
+4. **Parallel Processing**: Avatars are processed in parallel for maximum efficiency
+
 ## Getting Started
 
 First, run the development server:

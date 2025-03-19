@@ -26,6 +26,7 @@ type Post = {
 
 type PostWithImage = Post & {
   imageUrl?: string;
+  userAvatarUrl?: string;
 };
 
 export default function Middlebar() {
@@ -43,6 +44,35 @@ export default function Middlebar() {
   const [isLoadingPublicPosts, setIsLoadingPublicPosts] = useState(true);
   const [isLoadingUserPosts, setIsLoadingUserPosts] = useState(true);
   const router = useRouter();
+  const processedUserIds = useRef<Set<string>>(new Set());
+
+  const fetchUserAvatars = useCallback(async (posts: PostWithImage[]) => {
+    const userIds = posts
+      .filter(post => post.user?.id && !processedUserIds.current.has(post.user.id))
+      .map(post => post.user!.id!) as string[];
+    
+    if (userIds.length === 0) return posts;
+
+    try {
+      const response = await axios.post('/api/search/batch-avatars', { userIds });
+      const avatarUrls = response.data.avatarUrls || {};
+      
+      userIds.forEach(id => processedUserIds.current.add(id));
+      
+      return posts.map(post => {
+        if (post.user?.id && avatarUrls[post.user.id]) {
+          return {
+            ...post,
+            userAvatarUrl: avatarUrls[post.user.id]
+          };
+        }
+        return post;
+      });
+    } catch (error) {
+      console.error("Failed to fetch user avatars:", error);
+      return posts;
+    }
+  }, []);
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === "Enter" && !e.shiftKey) {
@@ -71,11 +101,12 @@ export default function Middlebar() {
       const posts = response.data.post;
       const signedUrls = response.data.link;
 
-      const postsWithImages = posts.map((post: Post) => ({
+      let postsWithImages = posts.map((post: Post) => ({
         ...post,
         imageUrl: signedUrls[post.id],
       }));
 
+      postsWithImages = await fetchUserAvatars(postsWithImages);
       setFetchPost(postsWithImages);
     } catch (error) {
       console.error("Fetch posts failed:", error);
@@ -83,7 +114,7 @@ export default function Middlebar() {
     } finally {
       setIsLoadingPublicPosts(false);
     }
-  }, [toast]);
+  }, [toast, fetchUserAvatars]);
 
   const fetchUserPost = useCallback(async () => {
     setIsLoadingUserPosts(true);
@@ -94,11 +125,12 @@ export default function Middlebar() {
       const posts = response.data.posts;
       const signedUrls = response.data.link || {};
 
-      const postsWithImages = posts.map((post: Post) => ({
+      let postsWithImages = posts.map((post: Post) => ({
         ...post,
         imageUrl: signedUrls[post.id],
       }));
 
+      postsWithImages = await fetchUserAvatars(postsWithImages);
       setUserPost(postsWithImages);
     } catch (error) {
       console.error("Fetch user posts failed:", error);
@@ -106,7 +138,7 @@ export default function Middlebar() {
     } finally {
       setIsLoadingUserPosts(false);
     }
-  }, [session?.user?.email, toast]);
+  }, [session?.user?.email, toast, fetchUserAvatars]);
 
   const handlePost = useCallback(async () => {
     if (!caption.trim() || isPosting) return;
@@ -128,6 +160,7 @@ export default function Middlebar() {
       if (fileInputRef.current) {
         fileInputRef.current.value = "";
       }
+      setFile(null);
       toast({ title: "Post created successfully" });
     } catch (error) {
       console.error("Post failed:", error);
@@ -178,7 +211,7 @@ export default function Middlebar() {
         >
           <AvatarImage
             key={post.id}
-            src={post.user?.image || ""}
+            src={post.userAvatarUrl || ""}
             alt="User Avatar"
           />
           <AvatarFallback>

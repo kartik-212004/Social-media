@@ -4,9 +4,12 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "concurrently \"node app/server/socket.js\" \"next dev\"",
+    "dev": "next dev",
+    "socket": "node app/server/socket.js",
+    "dev:all": "concurrently \"node app/server/socket.js\" \"next dev\"",
     "build": "next build && prisma generate",
-    "start": "concurrently \"node app/server/socket.js\" \"next start\"",
+    "start": "next start",
+    "start:all": "concurrently \"node app/server/socket.js\" \"next start\"",
     "postinstall": "prisma generate",
     "lint": "next lint"
   },
