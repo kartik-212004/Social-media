@@ -159,58 +159,59 @@ export default function Dashboard() {
         </div>
 
         <div className="mt-6 flex flex-col gap-4">
-          {posts.map((post) => (
-            <div
-              key={post.id}
-              className="p-4 hover:bg-zinc-100 dark:hover:bg-zinc-900 rounded-xl transition-colors duration-200 group"
-            >
-              <div className="flex items-center gap-3 mb-2">
-                <Avatar>
-                  <AvatarImage
-                    src={imageUrlAvatar ? imageUrlAvatar : ""}
-                  ></AvatarImage>
-                  <AvatarFallback>kb</AvatarFallback>
-                </Avatar>
-                <div>
-                  <div className="flex items-center gap-2">
-                    <span className="font-semibold">{user.name}</span>
-                    <span className="text-zinc-600 dark:text-zinc-400 text-sm">
-                      @{user.email.split("@")[0]}
-                    </span>
-                    <span className="text-zinc-500 text-sm">·</span>
-                    <span className="text-zinc-500 dark:text-zinc-400 text-sm">
-                      {formatDistanceToNow(new Date(post.createdAt), {
-                        addSuffix: true,
-                      })}
-                    </span>
+          {posts &&
+            posts.map((post) => (
+              <div
+                key={post.id}
+                className="p-4 hover:bg-zinc-100 dark:hover:bg-zinc-900 rounded-xl transition-colors duration-200 group"
+              >
+                <div className="flex items-center gap-3 mb-2">
+                  <Avatar>
+                    <AvatarImage
+                      src={imageUrlAvatar ? imageUrlAvatar : ""}
+                    ></AvatarImage>
+                    <AvatarFallback>kb</AvatarFallback>
+                  </Avatar>
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <span className="font-semibold">{user.name}</span>
+                      <span className="text-zinc-600 dark:text-zinc-400 text-sm">
+                        @{user.email.split("@")[0]}
+                      </span>
+                      <span className="text-zinc-500 text-sm">·</span>
+                      <span className="text-zinc-500 dark:text-zinc-400 text-sm">
+                        {formatDistanceToNow(new Date(post.createdAt), {
+                          addSuffix: true,
+                        })}
+                      </span>
+                    </div>
                   </div>
                 </div>
+
+                <p className="text-lg mb-3">{post.Caption}</p>
+
+                {post.url && (
+                  <div className="rounded-xl overflow-hidden border dark:border-zinc-800 mb-3">
+                    {post.mimeType.startsWith("image") ? (
+                      <img
+                        src={post.url}
+                        alt="Post content"
+                        className="w-full h-96 object-cover"
+                      />
+                    ) : (
+                      <video
+                        className="w-full h-96 object-cover"
+                        controls
+                        playsInline
+                      >
+                        <source src={post.url} type={post.mimeType} />
+                        Your browser does not support the video tag.
+                      </video>
+                    )}
+                  </div>
+                )}
               </div>
-
-              <p className="text-lg mb-3">{post.Caption}</p>
-
-              {post.url && (
-                <div className="rounded-xl overflow-hidden border dark:border-zinc-800 mb-3">
-                  {post.mimeType.startsWith("image") ? (
-                    <img
-                      src={post.url}
-                      alt="Post content"
-                      className="w-full h-96 object-cover"
-                    />
-                  ) : (
-                    <video
-                      className="w-full h-96 object-cover"
-                      controls
-                      playsInline
-                    >
-                      <source src={post.url} type={post.mimeType} />
-                      Your browser does not support the video tag.
-                    </video>
-                  )}
-                </div>
-              )}
-            </div>
-          ))}
+            ))}
         </div>
       </div>
     </div>
