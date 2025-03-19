@@ -1,6 +1,79 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# SocialConnect
 
-# Social Media Application
+A modern, feature-rich social media platform built with Next.js, TypeScript, and PostgreSQL.
+
+![SocialConnect Banner](https://example.com/banner.jpg)
+
+## Overview
+
+SocialConnect is a full-featured social media application that enables users to create profiles, share posts with images and videos, connect with others, and explore content from across the platform. The application features a responsive design, real-time updates, and a modern, intuitive interface.
+
+## Features
+
+### User Management
+- **Secure Authentication**: Email/password-based authentication using NextAuth.js
+- **User Profiles**: Customizable profiles with bio, avatar, and social links
+- **Profile Dashboard**: View your posts and profile information in one place
+
+### Social Interaction
+- **Posts with Media Support**: Share text posts with images or videos
+- **Dynamic Feed**: View a timeline of posts from all users
+- **My Posts Feed**: Filter to view only your own posts
+- **User Search**: Find other users by name with a responsive search function
+- **User Profiles**: Visit any user's profile by clicking on their avatar or name in posts
+
+### Media Handling
+- **Image & Video Upload**: Upload and share images and videos in posts
+- **Profile Pictures**: Upload and manage your profile picture
+- **Media Viewing**: Embedded image and video viewing within the feed
+
+### User Interface
+- **Responsive Design**: Works seamlessly on desktop and mobile devices
+- **Dark Mode Support**: Toggle between light and dark themes
+- **Real-time Updates**: Posts appear immediately after creation
+
+## Technology Stack
+
+### Frontend
+- **Next.js**: React framework for server-side rendering and static site generation
+- **TypeScript**: Type-safe JavaScript for improved developer experience
+- **Tailwind CSS**: Utility-first CSS framework for rapid UI development
+- **Radix UI**: Accessible UI components
+- **Lucide React**: Beautiful, consistent icons
+
+### Backend
+- **Next.js API Routes**: Serverless API endpoints
+- **Prisma ORM**: Type-safe database access
+- **PostgreSQL**: Robust relational database for data storage
+- **AWS S3**: Cloud storage for images and videos
+- **NextAuth.js**: Authentication solution for Next.js
+
+### Optimization
+- **Batch Processing**: Efficient loading of user avatars through batched API calls
+- **Lazy Loading**: Optimized image loading for better performance
+- **Error Handling**: Graceful error handling for failed media loads
+
+## Project Structure
+
+```
+/
+├── app/                 # Next.js app directory
+│   ├── api/             # API routes
+│   ├── account/         # Account management pages
+│   ├── dashboard/       # User dashboards
+│   ├── profile/         # Profile pages
+│   ├── search/          # User search functionality
+│   └── ...              # Other app routes
+├── components/          # Reusable React components
+│   ├── ui/              # UI components
+│   ├── middle-bar.tsx   # Main feed component
+│   ├── left-sidebar.tsx # Navigation sidebar
+│   └── ...              # Other components
+├── hooks/               # Custom React hooks
+├── prisma/              # Prisma schema and migrations
+├── public/              # Static assets
+└── ...                  # Configuration files
+```
 
 ## Optimized Avatar Loading
 
@@ -30,35 +103,107 @@ The application uses a batch processing approach to efficiently load user avatar
 
 ## Getting Started
 
-First, run the development server:
+### Prerequisites
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+- Node.js (v18+ recommended)
+- PostgreSQL database
+- AWS S3 bucket for media storage
+- npm or yarn
+
+### Environment Variables
+
+Create a `.env.local` file with the following variables:
+
+```
+# Database
+DATABASE_URL="postgresql://username:password@localhost:5432/socialconnect"
+
+# NextAuth
+NEXTAUTH_SECRET="your-secret-key"
+NEXTAUTH_URL="http://localhost:3000"
+
+# AWS S3
+BUCKET_REGION="your-region"
+BUCKET_NAME="your-bucket-name"
+BUCKET_POST_NAME="your-post-bucket-name"
+ACCESS_KEY="your-access-key"
+SECRET_ACCESS_KEY="your-secret-access-key"
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### Installation
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/yourusername/socialconnect.git
+   cd socialconnect
+   ```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+2. Install dependencies:
+   ```bash
+   npm install
+   # or
+   yarn install
+   ```
 
-## Learn More
+3. Set up the database:
+   ```bash
+   npx prisma migrate dev
+   ```
 
-To learn more about Next.js, take a look at the following resources:
+4. Start the development server:
+   ```bash
+   npm run dev
+   # or
+   yarn dev
+   ```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+5. Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### Production Deployment
 
-## Deploy on Vercel
+To build for production:
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+```bash
+npm run build
+# or
+yarn build
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+To start the production server:
+
+```bash
+npm run start
+# or
+yarn start
+```
+
+## Deployment Options
+
+SocialConnect can be deployed on various platforms:
+
+- **Vercel**: Recommended for Next.js applications
+- **AWS**: Using services like EC2, ECS, or Lambda
+- **Heroku**: Simple deployment with PostgreSQL add-on
+- **Docker**: Containerized deployment option
+
+## Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add some amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+## License
+
+This project is licensed under the MIT License - see the LICENSE file for details.
+
+## Acknowledgements
+
+- [Next.js](https://nextjs.org/)
+- [Prisma](https://www.prisma.io/)
+- [Tailwind CSS](https://tailwindcss.com/)
+- [AWS S3](https://aws.amazon.com/s3/)
+- [Vercel](https://vercel.com/)
