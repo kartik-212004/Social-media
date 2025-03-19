@@ -5,9 +5,26 @@ import { useSearchParams } from "next/navigation";
 import Loading from "../loading";
 import { useUserImage } from "@/hooks/useAwsImage";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import {
+  Globe,
+  Github,
+  Twitter,
+  Linkedin,
+  Instagram,
+  Facebook,
+  Youtube,
+  Dribbble,
+  Link as LinkIcon,
+} from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 
 export default function Dashboard() {
+  type LinkType = {
+    id: string;
+    url: string;
+    userId: string;
+  };
+
   type Post = {
     id: string;
     Caption: string;
@@ -25,6 +42,7 @@ export default function Dashboard() {
 
   const [user, setUser] = useState<User | null>(null);
   const [posts, setPosts] = useState<Post[]>([]);
+  const [links, setLinks] = useState<LinkType[]>([]);
   const searchParams = useSearchParams();
   const userId = searchParams.get("id");
   const { imageUrlAvatar, error } = useUserImage({ id: userId || "" });
@@ -43,7 +61,17 @@ export default function Dashboard() {
       setUser(response.data.user);
       if (response.data.user?.email) {
         fetchPosts(response.data.user.email);
+        fetchLinks(response.data.user.email);
       }
+    } catch (error) {
+      console.error(error);
+    }
+  };
+  const fetchLinks = async (email: string) => {
+    try {
+      const response = await axios.get(`/api/links/?email=${email}`);
+      console.log(response.data.links[0].link);
+      setLinks(response.data.links[0].link);
     } catch (error) {
       console.error(error);
     }
@@ -61,6 +89,29 @@ export default function Dashboard() {
     } catch (error) {
       console.error(error);
     }
+  };
+
+  const getLinkIcon = (url: string) => {
+    const domain = url.toLowerCase();
+
+    if (domain.includes("github.com"))
+      return { icon: <Github size={16} />, name: "Github" };
+    if (domain.includes("twitter.com") || domain.includes("x.com"))
+      return { icon: <Twitter size={16} />, name: "Twitter" };
+    if (domain.includes("linkedin.com"))
+      return { icon: <Linkedin size={16} />, name: "Linkedin" };
+    if (domain.includes("pornhub.com"))
+      return { icon: <Popcorn size={16} />, name: "Pornhub" };
+    if (domain.includes("instagram.com"))
+      return { icon: <Instagram size={16} />, name: "Instagram" };
+    if (domain.includes("facebook.com"))
+      return { icon: <Facebook size={16} />, name: "Facebook" };
+    if (domain.includes("youtube.com"))
+      return { icon: <Youtube size={16} />, name: "Youtube" };
+    if (domain.includes("dribbble.com"))
+      return { icon: <Dribbble size={16} />, name: "Dribbble" };
+
+    return { icon: <Globe size={16} />, name: "Link" };
   };
 
   if (error?.message == "Request failed with status code 404") {
@@ -97,6 +148,14 @@ export default function Dashboard() {
               month: "long",
             })}
           </p>
+          <ul className="pt-2 flex flex-row space-x-2 ">
+            {links &&
+              links.map((link, id) => (
+                <li key={id}>
+                  <a href={link.url}>{getLinkIcon(link.url).icon}</a>
+                </li>
+              ))}
+          </ul>
         </div>
 
         <div className="mt-6 flex flex-col gap-4">

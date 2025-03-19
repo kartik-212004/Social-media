@@ -5,11 +5,11 @@ import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useSession } from "next-auth/react";
-import { Popcorn } from "lucide-react";
 import axios from "axios";
 import {
   Globe,
   Github,
+  Popcorn,
   Twitter,
   Linkedin,
   Instagram,
