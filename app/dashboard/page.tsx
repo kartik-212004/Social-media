@@ -17,6 +17,7 @@ import {
   Dribbble,
 } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
+import { Dialog, DialogContent, DialogOverlay } from "@radix-ui/react-dialog";
 
 export default function Dashboard() {
   type LinkType = {
@@ -42,6 +43,7 @@ export default function Dashboard() {
 
   const [user, setUser] = useState<User | null>(null);
   const [posts, setPosts] = useState<Post[]>([]);
+  const [previewOpen, setPreviewOpen] = useState(false);
   const [links, setLinks] = useState<LinkType[]>([]);
   const searchParams = useSearchParams();
   const userId = searchParams.get("id");
@@ -129,7 +131,20 @@ export default function Dashboard() {
       <div className="max-w-2xl mx-auto">
         <div className="flex flex-col h-min justify-center pb-6 border-b dark:border-zinc-800 mb-6">
           <div className="flex items-center gap-4">
-            <Avatar>
+            <Dialog open={previewOpen} onOpenChange={setPreviewOpen}>
+              <DialogOverlay className="fixed inset-0 border-0 bg-black/50 flex items-center justify-center z-50">
+                <DialogContent className="bg-transparent border-0 border-none shadow-none max-w-md w-full mx-auto p-4">
+                  <div className="w-60 h-60 mx-auto overflow-hidden rounded-full ">
+                    <img
+                      src={imageUrlAvatar || ""}
+                      className="w-full h-full border-0 object-cover"
+                      alt="User Avatar"
+                    />
+                  </div>
+                </DialogContent>
+              </DialogOverlay>
+            </Dialog>
+            <Avatar onClick={() => setPreviewOpen((value) => !value)}>
               <AvatarImage
                 className="object-cover"
                 src={imageUrlAvatar || ""}
