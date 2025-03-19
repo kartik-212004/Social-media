@@ -17,7 +17,7 @@ const Message: React.FC = () => {
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
 
   const WS_URL =
-    process.env.NEXT_PUBLIC_WS_URL || "ws://quick-post-phi.vercel.app/8080";
+    process.env.NEXT_PUBLIC_WS_URL || "wss://quick-post-phi.vercel.app/8080";
 
   useEffect(() => {
     // Function to connect to WebSocket

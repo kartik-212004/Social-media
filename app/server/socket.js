@@ -1,11 +1,5 @@
 import { WebSocketServer } from 'ws';
-import express from 'express';
-import http from 'http';
-
-const app = express();
-
-const server = http.createServer(app);
-const wss = new WebSocketServer({ server });
+const wss = new WebSocketServer({ port:8080 });
 
 let clientCount = 0;
 
@@ -47,9 +41,4 @@ wss.on('connection', function connection(ws) {
 
 app.get('/', (req, res) => {
   res.send('WebSocket server is running');
-});
-
-const PORT = process.env.PORT || 8080;
-server.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
 });
