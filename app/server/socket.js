@@ -32,7 +32,6 @@ wss.on('connection', function connection(ws) {
   clientCount++;
   console.log(`Client connected: ${clientCount}`);
   
-  // Send current client count to the new client
   broadcastClientCount();
 
   ws.on('message', function message(data) {

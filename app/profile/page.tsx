@@ -73,7 +73,6 @@ export default function Profile() {
     return { icon: <Globe size={16} />, name: "Link" };
   };
 
-  // backend request
   const handleSubmit = async () => {
     setisposting(true);
     try {
@@ -93,7 +92,6 @@ export default function Profile() {
     }
   };
 
-  // fetch from backend
   const fetchData = async () => {
     setisloading(true);
     if (!session?.user?.email) {

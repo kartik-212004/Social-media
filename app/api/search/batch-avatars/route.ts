@@ -23,7 +23,6 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Fetch all users in a single database query
     const users = await prisma.user.findMany({
       where: {
         id: { in: userIds },
@@ -35,10 +34,8 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    // Create a mapping of user IDs to URLs
     const avatarUrls: Record<string, string> = {};
 
-    // Process all avatar URLs in parallel
     await Promise.all(
       users.map(async (user) => {
         if (!user.imageName && !user.imageUrl) {
@@ -58,7 +55,7 @@ export async function POST(req: NextRequest) {
             avatarUrls[user.id] = signedUrl;
           } catch (error) {
             console.error(`Error generating signed URL for user ${user.id}:`, error);
-            // Fall back to imageUrl if available
+ 
             if (user.imageUrl) {
               avatarUrls[user.id] = user.imageUrl;
             }

@@ -38,7 +38,6 @@ export async function POST(req: NextRequest) {
   
   const signedUrls: Record<string, string> = {};
   
-  // Use Promise.all to wait for all signed URL generation to complete
   await Promise.all(
     posts.map(async (post) => {
       if (post.postName) {

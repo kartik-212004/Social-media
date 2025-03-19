@@ -20,9 +20,7 @@ const Message: React.FC = () => {
     process.env.NEXT_PUBLIC_WS_URL || "wss://quick-post-phi.vercel.app/8080";
 
   useEffect(() => {
-    // Function to connect to WebSocket
     const connectWebSocket = () => {
-      // Close existing connection if any
       if (socketRef.current) {
         socketRef.current.close();
       }
@@ -58,7 +56,6 @@ const Message: React.FC = () => {
         console.log("WebSocket disconnected");
         setConnectionStatus("disconnected");
 
-        // Try to reconnect after a delay
         setTimeout(connectWebSocket, 5000);
       };
     };

@@ -85,13 +85,10 @@ export default function Dashboard() {
     try {
       const response = await axios.post("/api/posts/user-posts", { email });
       
-      // Ensure we wait for all posts and their images to load
       const posts = response.data.posts;
       const signedUrls = response.data.link || {};
       
-      // Map posts with their URLs
       const postsWithUrls = posts.map((post: Post) => {
-        // Check for missing URLs that should exist
         if (post.postName && !signedUrls[post.id]) {
           console.log(`Missing URL for post ${post.id} with postName ${post.postName}`);
         }
@@ -102,7 +99,6 @@ export default function Dashboard() {
         };
       });
       
-      // Only set posts state after all the data is ready
       setPosts(postsWithUrls);
     } catch (error) {
       console.error("Error fetching posts:", error);
