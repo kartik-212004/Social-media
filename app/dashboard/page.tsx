@@ -13,8 +13,8 @@ import {
   Instagram,
   Facebook,
   Youtube,
+  Popcorn,
   Dribbble,
-  Link as LinkIcon,
 } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 
