@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "concurrently \"node app/server/socket.js\" \"next dev\"",
-    "build": "next build",
+    "build": "next build && prisma generate",
     "start": "concurrently \"node app/server/socket.js\" \"next start\"",
     "lint": "next lint"
   },
