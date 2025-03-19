@@ -7,6 +7,7 @@
     "dev": "concurrently \"node app/server/socket.js\" \"next dev\"",
     "build": "next build && prisma generate",
     "start": "concurrently \"node app/server/socket.js\" \"next start\"",
+    "postinstall": "prisma generate",
     "lint": "next lint"
   },
   "dependencies": {
