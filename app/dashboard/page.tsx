@@ -69,6 +69,7 @@ export default function Dashboard() {
       console.error(error);
     }
   };
+  
   const fetchLinks = async (email: string) => {
     try {
       const response = await axios.get(`/api/links/?email=${email}`);
