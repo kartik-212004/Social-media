@@ -7,6 +7,7 @@ import { useToast } from "@/hooks/use-toast";
 import axios from "axios";
 import { Input } from "./ui/input";
 import { useProfileImage } from "@/hooks/useProfileImage";
+import { useRouter } from "next/navigation";
 // import { useUserImage } from "@/hooks/useAwsImage";
 
 type Post = {
@@ -15,7 +16,9 @@ type Post = {
   createdAt: string;
   postName?: string;
   mimeType: string;
+  userId?: string;
   user?: {
+    id?: string;
     name?: string;
     image?: string;
   };
@@ -39,6 +42,7 @@ export default function Middlebar() {
   const [tabBar, setTabBar] = useState(true);
   const [isLoadingPublicPosts, setIsLoadingPublicPosts] = useState(true);
   const [isLoadingUserPosts, setIsLoadingUserPosts] = useState(true);
+  const router = useRouter();
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === "Enter" && !e.shiftKey) {
@@ -151,13 +155,27 @@ export default function Middlebar() {
     fetchUserPost();
   }, [fetchPosts, fetchUserPost]);
 
+  const handleUserClick = (userId: string | undefined) => {
+    if (userId) {
+      router.push(`/dashboard/?id=${userId}`);
+    } else {
+      toast({ 
+        title: "Could not find user profile", 
+        description: "User information is not available"
+      });
+    }
+  };
+
   const renderPostItem = (post: PostWithImage) =>
     post && (
       <div
         key={post.id}
         className="p-4 px-6 hover:bg-zinc-100 dark:hover:bg-[#070707] transition-colors duration-200 flex items-start space-x-4"
       >
-        <Avatar className="mt-2">
+        <Avatar 
+          className="mt-2 cursor-pointer" 
+          onClick={() => handleUserClick(post.user?.id)}
+        >
           <AvatarImage
             key={post.id}
             src={post.user?.image || ""}
@@ -170,7 +188,12 @@ export default function Middlebar() {
 
         <div className="flex-1">
           <div className="flex items-center py-2 space-x-2">
-            <span className="font-semibold">{post.user?.name}</span>
+            <span 
+              className="font-semibold cursor-pointer hover:underline" 
+              onClick={() => handleUserClick(post.user?.id)}
+            >
+              {post.user?.name}
+            </span>
             <span className="text-zinc-500 text-sm">
               {new Date(post.createdAt).toLocaleString()}
             </span>
