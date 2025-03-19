@@ -83,14 +83,23 @@ export default function Dashboard() {
   const fetchPosts = async (email: string) => {
     try {
       const response = await axios.post("/api/posts/user-posts", { email });
-      setPosts(
-        response.data.posts.map((post: Post) => ({
+      console.log("Post response:", response.data);
+      
+      const postsWithUrls = response.data.posts.map((post: Post) => {
+        // Log to help with debugging
+        if (post.postName && !response.data.link[post.id]) {
+          console.log(`Missing URL for post ${post.id} with postName ${post.postName}`);
+        }
+        
+        return {
           ...post,
           url: response.data.link[post.id] || "",
-        }))
-      );
+        };
+      });
+      
+      setPosts(postsWithUrls);
     } catch (error) {
-      console.error(error);
+      console.error("Error fetching posts:", error);
     }
   };
 
@@ -209,26 +218,38 @@ export default function Dashboard() {
 
                 <p className="text-lg mb-3">{post.Caption}</p>
 
-                {post.url && (
+                {post.url ? (
                   <div className="rounded-xl overflow-hidden border dark:border-zinc-800 mb-3">
-                    {post.mimeType.startsWith("image") ? (
+                    {post.mimeType?.startsWith("image") ? (
                       <img
                         src={post.url}
                         alt="Post content"
                         className="w-full h-96 object-cover"
+                        onError={(e) => {
+                          console.error(`Failed to load image for post ${post.id}`);
+                          e.currentTarget.style.display = 'none';
+                        }}
                       />
-                    ) : (
+                    ) : post.mimeType?.startsWith("video") ? (
                       <video
                         className="w-full h-96 object-cover"
                         controls
                         playsInline
+                        onError={(e) => {
+                          console.error(`Failed to load video for post ${post.id}`);
+                          e.currentTarget.style.display = 'none';
+                        }}
                       >
                         <source src={post.url} type={post.mimeType} />
                         Your browser does not support the video tag.
                       </video>
-                    )}
+                    ) : null}
                   </div>
-                )}
+                ) : post.postName ? (
+                  <div className="p-4 text-center text-zinc-500">
+                    Media content could not be loaded
+                  </div>
+                ) : null}
               </div>
             ))}
         </div>

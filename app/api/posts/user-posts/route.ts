@@ -10,7 +10,7 @@ const s3client = new S3Client({
     secretAccessKey: process.env.SECRET_ACCESS_KEY!,
   },
 });
-const signedUrls: Record<string, string> = {};
+
 const prisma = new PrismaClient();
 
 export async function POST(req: NextRequest) {
@@ -35,8 +35,12 @@ export async function POST(req: NextRequest) {
       createdAt: "desc",
     },
   });
-  posts.map(async (post) => {
-    {
+  
+  const signedUrls: Record<string, string> = {};
+  
+  // Use Promise.all to wait for all signed URL generation to complete
+  await Promise.all(
+    posts.map(async (post) => {
       if (post.postName) {
         const command = new GetObjectCommand({
           Bucket: process.env.BUCKET_POST_NAME!,
@@ -46,8 +50,8 @@ export async function POST(req: NextRequest) {
           expiresIn: 93600,
         });
       }
-    }
-  });
+    })
+  );
 
   return NextResponse.json(
     { message: "Posts Fetched", posts: posts, link: signedUrls },
