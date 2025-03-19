@@ -72,7 +72,7 @@ const handler = NextAuth({
   session: {
     strategy: "jwt",
   },
-  secret: "kartikbhatt",
+  secret: process.env.AUTH_SECRET,
   callbacks: {
     async signIn({ user, account }) {
       if (!user.email) return false;
