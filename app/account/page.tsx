@@ -72,7 +72,7 @@ export default function Account() {
   const removeImage = useCallback(async () => {
     if (!session?.user?.email) return;
     try {
-      await axios.delete(`/api/s3/delete/${session.user.email}`);
+      await axios.delete(`/api/s3/delete/?email=${session.user.email}`);
       await refetchImage();
       toast({ title: "Image removed successfully" });
     } catch (error) {
