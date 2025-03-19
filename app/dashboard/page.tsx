@@ -130,7 +130,10 @@ export default function Dashboard() {
         <div className="flex flex-col h-min justify-center pb-6 border-b dark:border-zinc-800 mb-6">
           <div className="flex items-center gap-4">
             <Avatar>
-              <AvatarImage src={imageUrlAvatar || ""}></AvatarImage>
+              <AvatarImage
+                className="object-cover"
+                src={imageUrlAvatar || ""}
+              ></AvatarImage>
               <AvatarFallback>kb</AvatarFallback>
             </Avatar>
             <div>
