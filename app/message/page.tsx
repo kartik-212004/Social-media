@@ -10,50 +10,78 @@ const Message: React.FC = () => {
   const [messages, setMessages] = useState<
     { sender: string; text: string; time: string }[]
   >([]);
+  const [connectionStatus, setConnectionStatus] =
+    useState<string>("connecting");
   const socketRef = useRef<WebSocket | null>(null);
   const session = useSession();
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
 
+  const WS_URL =
+    process.env.NEXT_PUBLIC_WS_URL ||
+    "wss://quick-post-phi.vercel.app/";
+
   useEffect(() => {
-    socketRef.current = new WebSocket("ws://localhost:8080");
-
-    socketRef.current.onopen = () => {
-      console.log("Connected to WebSocket");
-    };
-
-    socketRef.current.onmessage = (event) => {
-      try {
-        const data = JSON.parse(event.data);
-        
-        if (data.type === "clientCount") {
-          setClientCount(data.count);
-        } else if (data.sender && data.text) {
-          setMessages((prev) => [...prev, data]);
-        }
-      } catch (error) {
-        console.error("Error parsing WebSocket message:", error);
+    // Function to connect to WebSocket
+    const connectWebSocket = () => {
+      // Close existing connection if any
+      if (socketRef.current) {
+        socketRef.current.close();
       }
+
+      setConnectionStatus("connecting");
+      socketRef.current = new WebSocket(WS_URL);
+
+      socketRef.current.onopen = () => {
+        console.log("Connected to WebSocket");
+        setConnectionStatus("connected");
+      };
+
+      socketRef.current.onmessage = (event) => {
+        try {
+          const data = JSON.parse(event.data);
+
+          if (data.type === "clientCount") {
+            setClientCount(data.count);
+          } else if (data.sender && data.text) {
+            setMessages((prev) => [...prev, data]);
+          }
+        } catch (error) {
+          console.error("Error parsing WebSocket message:", error);
+        }
+      };
+
+      socketRef.current.onerror = (error) => {
+        console.error("WebSocket error:", error);
+        setConnectionStatus("error");
+      };
+
+      socketRef.current.onclose = () => {
+        console.log("WebSocket disconnected");
+        setConnectionStatus("disconnected");
+
+        // Try to reconnect after a delay
+        setTimeout(connectWebSocket, 5000);
+      };
     };
 
-    socketRef.current.onerror = (error) => {
-      console.error("WebSocket error:", error);
-    };
-
-    socketRef.current.onclose = () => {
-      console.log("WebSocket disconnected");
-    };
+    connectWebSocket();
 
     return () => {
       socketRef.current?.close();
     };
-  }, []);
+  }, [WS_URL]);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
   const handleSendMessage = () => {
-    if (session.data?.user?.name && message.trim() && socketRef.current) {
+    if (
+      session.data?.user?.name &&
+      message.trim() &&
+      socketRef.current &&
+      socketRef.current.readyState === WebSocket.OPEN
+    ) {
       const newMessage = {
         sender: session.data.user.name,
         text: message,
@@ -73,11 +101,31 @@ const Message: React.FC = () => {
   return (
     <div className="flex h-screen bg-background text-foreground">
       <div className="flex-1 dark:border-zinc-800 border-x-2 flex flex-col">
-        <div className="p-4 border-b border-zinc-800 flex items-center bg-card">
-          <div className="h-8 w-8 rounded-full bg-blue-500 flex items-center justify-center text-white font-bold mr-2">
-            {session.data?.user?.name?.[0] || "C"}
+        <div className="p-4 border-b border-zinc-800 flex items-center justify-between bg-card">
+          <div className="flex items-center">
+            <div className="h-8 w-8 rounded-full bg-blue-500 flex items-center justify-center text-white font-bold mr-2">
+              {session.data?.user?.name?.[0] || "C"}
+            </div>
+            <p className="font-medium">
+              Chat {clientCount > 0 ? `(${clientCount} online)` : ""}
+            </p>
           </div>
-          <p className="font-medium">Chat {clientCount > 0 ? `(${clientCount} online)` : ""}</p>
+          <div className="text-xs flex items-center">
+            <span
+              className={`inline-block w-2 h-2 rounded-full mr-1 ${
+                connectionStatus === "connected"
+                  ? "bg-green-500"
+                  : connectionStatus === "connecting"
+                  ? "bg-yellow-500"
+                  : "bg-red-500"
+              }`}
+            ></span>
+            {connectionStatus === "connected"
+              ? "Connected"
+              : connectionStatus === "connecting"
+              ? "Connecting"
+              : "Disconnected"}
+          </div>
         </div>
 
         <div className="flex-1 overflow-y-auto p-4 flex flex-col justify-end">
@@ -133,11 +181,12 @@ const Message: React.FC = () => {
             onChange={(e) => setMessage(e.target.value)}
             onKeyDown={handleKeyDown}
             className="flex-1 rounded-full bg-muted text-foreground"
+            disabled={connectionStatus !== "connected"}
           />
           <Button
             onClick={handleSendMessage}
             className="ml-2 rounded-full h-10 w-10 p-0 flex items-center justify-center bg-blue-500 hover:bg-blue-600 text-white"
-            disabled={!message.trim()}
+            disabled={!message.trim() || connectionStatus !== "connected"}
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
