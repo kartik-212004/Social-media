@@ -34,7 +34,7 @@ export function SignUpForm({
 
     const ModifiedName = name[0].toUpperCase() + name.slice(1);
     try {
-      const handle = await axios.post("http://localhost:3000/api/signup", {
+      const handle = await axios.post("/api/signup", {
         email: email,
         password: password,
         name: ModifiedName,
