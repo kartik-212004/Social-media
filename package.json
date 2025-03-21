@@ -8,7 +8,7 @@
     "socket": "node app/server/socket.js",
     "dev:all": "concurrently \"node app/server/socket.js\" \"next dev\"",
     "build": "next build && prisma generate",
-    "start": "next start",
+    "start": " next build && next start",
     "start:all": "concurrently \"node app/server/socket.js\" \"next start\"",
     "postinstall": "prisma generate",
     "lint": "next lint"
