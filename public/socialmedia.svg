@@ -3,7 +3,7 @@
   <rect width="900" height="700" fill="#f8fafc" rx="10" ry="10"/>
   
   <!-- Title -->
-  <text x="450" y="40" font-family="Arial" font-size="24" font-weight="bold" text-anchor="middle" fill="#0f172a">SocialConnect System Architecture</text>
+  <text x="450" y="40" font-family="Arial" font-size="24" font-weight="bold" text-anchor="middle" fill="#0f172a">QuickPost System Design Architecture</text>
   
   <!-- Client Layer -->
   <rect x="50" y="80" width="800" height="100" rx="10" ry="10" fill="#dbeafe" stroke="#3b82f6" stroke-width="2"/>

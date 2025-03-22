@@ -15,7 +15,7 @@
 
 ## ✨ Overview
 
-**SocialConnect** is a next-generation social media application that offers an engaging and interactive experience. Users can create profiles, share multimedia posts, connect with others, and explore dynamic content with real-time updates.
+**socialmedia** is a next-generation social media application that offers an engaging and interactive experience. Users can create profiles, share multimedia posts, connect with others, and explore dynamic content with real-time updates.
 
 ## 🔥 Features at a Glance
 
@@ -66,7 +66,6 @@
 ## 📂 Project Structure
 
 ```bash
-/
 ├── app/
 │   ├── api/
 │   ├── account/
@@ -80,30 +79,6 @@
 └── ...
 ```
 
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 700">
- 
-</svg>
-
-## ⚡ Avatar Optimization Flow
-
-```mermaid
-graph TD
-    A[Load Posts] --> B[Extract Unique User IDs]
-    B --> C[Batch Request for Avatars]
-    C --> D[Process Avatar URLs from S3]
-    D --> E[Update Posts with Avatar URLs]
-    E --> F[Render Posts with Avatars]
-```
-
-### 🚀 Benefits:
-
-✔ **Reduced API Calls** – Batch processing minimizes network requests  
-✔ **Lightning-Fast Performance** – Optimized avatar loading for a smooth experience  
-✔ **Smart Caching** – Avoids redundant image fetches  
-✔ **Parallel Processing** – Efficiently loads user profiles
-
----
-
 ## 🚦 Getting Started
 
 ### Prerequisites
@@ -116,13 +91,13 @@ graph TD
 ### Installation
 
 ```bash
-git clone https://github.com/yourusername/socialconnect.git
-cd socialconnect
+git clone https://github.com/yourusername/socialmedia.git
+cd socialmedia
 npm install
 npm run dev
 ```
 
-🔗 Open **[http://localhost:3000](http://localhost:3000)** to explore SocialConnect.
+🔗 Open **[http://localhost:3000](http://localhost:3000)** to explore socialmedia.
 
 ---
 
@@ -143,7 +118,7 @@ npm run start
 
 ## 👥 Contributing
 
-We welcome contributions to SocialConnect! 🚀
+We welcome contributions to socialmedia! 🚀
 
 1. Fork the repository
 2. Create a new branch: `git checkout -b feature/amazing-feature`
@@ -161,17 +136,18 @@ This project is licensed under the MIT License. See the **LICENSE** file for det
 
 ## 🙏 Acknowledgements
 
-- [Next.js](https://nextjs.org/) - The React framework for production
-- [Prisma](https://www.prisma.io/) - Next-generation ORM
-- [Tailwind CSS](https://tailwindcss.com/) - Utility-first CSS framework
-- [AWS S3](https://aws.amazon.com/s3/) - Object storage service
-- [Vercel](https://vercel.com/) - Next.js deployment platform
+- <img src="https://assets.vercel.com/image/upload/front/favicon/vercel/favicon.ico" alt="nextjs" width="20" height="20"> [Next.js](https://nextjs.org/) - The React framework for production
+- <img src="https://www.prisma.io/images/favicon-32x32.png" alt="prisma" width="20" height="20"> [Prisma](https://www.prisma.io/) - Next-generation ORM
+- <img src="https://tailwindcss.com/favicons/favicon.ico?v=4" alt="Vercel" width="20" height="20"> [Tailwind CSS](https://tailwindcss.com/) - Utility-first CSS framework
+- <img src="https://a.b.cdn.console.awsstatic.com/a/v1/DKY2SIL5N3MJQCULDNOQE7TKLNQIUXRSOHBJKJGQAHLZO7TLH3TQ/icon/c0828e0381730befd1f7a025057c74fb-43acc0496e64afba82dbc9ab774dc622.svg" alt="Vercel" width="20" height="20"> [AWS S3](https://aws.amazon.com/s3/) - Object storage service
+- <img src="https://www.typescriptlang.org/favicon-32x32.png?v=8944a05a8b601855de116c8a56d3b3ae
+  " alt="Vercel" width="20" height="20"> [Vercel](https://vercel.com/) - Type Script
 
 ---
 
 <div align="center">
   
-  **Built with ❤️ by the SocialConnect Team**
+  **Built with ❤️ by the socialmedia Team**
   
   [🌍 Website](https://quick-post-phi.vercel.app/)  • [📧 Support](mailto:kartik200421@gmail.com)
   
