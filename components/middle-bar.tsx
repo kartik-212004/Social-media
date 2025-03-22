@@ -48,22 +48,26 @@ export default function Middlebar() {
 
   const fetchUserAvatars = useCallback(async (posts: PostWithImage[]) => {
     const userIds = posts
-      .filter(post => post.user?.id && !processedUserIds.current.has(post.user.id))
-      .map(post => post.user!.id!) as string[];
-    
+      .filter(
+        (post) => post.user?.id && !processedUserIds.current.has(post.user.id)
+      )
+      .map((post) => post.user!.id!) as string[];
+
     if (userIds.length === 0) return posts;
 
     try {
-      const response = await axios.post('/api/search/batch-avatars', { userIds });
+      const response = await axios.post("/api/search/batch-avatars", {
+        userIds,
+      });
       const avatarUrls = response.data.avatarUrls || {};
-      
-      userIds.forEach(id => processedUserIds.current.add(id));
-      
-      return posts.map(post => {
+
+      userIds.forEach((id) => processedUserIds.current.add(id));
+
+      return posts.map((post) => {
         if (post.user?.id && avatarUrls[post.user.id]) {
           return {
             ...post,
-            userAvatarUrl: avatarUrls[post.user.id]
+            userAvatarUrl: avatarUrls[post.user.id],
           };
         }
         return post;
@@ -192,9 +196,9 @@ export default function Middlebar() {
     if (userId) {
       router.push(`/dashboard/?id=${userId}`);
     } else {
-      toast({ 
-        title: "Could not find user profile", 
-        description: "User information is not available"
+      toast({
+        title: "Could not find user profile",
+        description: "User information is not available",
       });
     }
   };
@@ -205,14 +209,15 @@ export default function Middlebar() {
         key={post.id}
         className="p-4 px-6 hover:bg-zinc-100 dark:hover:bg-[#070707] transition-colors duration-200 flex items-start space-x-4"
       >
-        <Avatar 
-          className="mt-2 cursor-pointer" 
+        <Avatar
+          className="mt-2 cursor-pointer"
           onClick={() => handleUserClick(post.user?.id)}
         >
           <AvatarImage
             key={post.id}
             src={post.userAvatarUrl || ""}
             alt="User Avatar"
+            className="object-cover"
           />
           <AvatarFallback>
             <Camera />
@@ -221,8 +226,8 @@ export default function Middlebar() {
 
         <div className="flex-1">
           <div className="flex items-center py-2 space-x-2">
-            <span 
-              className="font-semibold cursor-pointer hover:underline" 
+            <span
+              className="font-semibold cursor-pointer hover:underline"
               onClick={() => handleUserClick(post.user?.id)}
             >
               {post.user?.name}
