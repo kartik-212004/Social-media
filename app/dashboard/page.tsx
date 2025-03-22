@@ -70,7 +70,7 @@ export default function Dashboard() {
       console.error(error);
     }
   };
-  
+
   const fetchLinks = async (email: string) => {
     try {
       const response = await axios.get(`/api/links/?email=${email}`);
@@ -84,21 +84,23 @@ export default function Dashboard() {
   const fetchPosts = async (email: string) => {
     try {
       const response = await axios.post("/api/posts/user-posts", { email });
-      
+
       const posts = response.data.posts;
       const signedUrls = response.data.link || {};
-      
+
       const postsWithUrls = posts.map((post: Post) => {
         if (post.postName && !signedUrls[post.id]) {
-          console.log(`Missing URL for post ${post.id} with postName ${post.postName}`);
+          console.log(
+            `Missing URL for post ${post.id} with postName ${post.postName}`
+          );
         }
-        
+
         return {
           ...post,
           url: signedUrls[post.id] || "",
         };
       });
-      
+
       setPosts(postsWithUrls);
     } catch (error) {
       console.error("Error fetching posts:", error);
@@ -198,6 +200,7 @@ export default function Dashboard() {
                 <div className="flex items-center gap-3 mb-2">
                   <Avatar>
                     <AvatarImage
+                      className="object-cover"
                       src={imageUrlAvatar ? imageUrlAvatar : ""}
                     ></AvatarImage>
                     <AvatarFallback>kb</AvatarFallback>
@@ -228,8 +231,10 @@ export default function Dashboard() {
                         alt="Post content"
                         className="w-full h-96 object-cover"
                         onError={(e) => {
-                          console.error(`Failed to load image for post ${post.id}`);
-                          e.currentTarget.style.display = 'none';
+                          console.error(
+                            `Failed to load image for post ${post.id}`
+                          );
+                          e.currentTarget.style.display = "none";
                         }}
                       />
                     ) : post.mimeType?.startsWith("video") ? (
@@ -238,8 +243,10 @@ export default function Dashboard() {
                         controls
                         playsInline
                         onError={(e) => {
-                          console.error(`Failed to load video for post ${post.id}`);
-                          e.currentTarget.style.display = 'none';
+                          console.error(
+                            `Failed to load video for post ${post.id}`
+                          );
+                          e.currentTarget.style.display = "none";
                         }}
                       >
                         <source src={post.url} type={post.mimeType} />
