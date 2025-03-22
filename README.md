@@ -1,7 +1,6 @@
 # 🚀 QUICK POST
 
 <div align="center">
-  
 
 [![Next.js](https://img.shields.io/badge/Next.js-black?style=for-the-badge&logo=next.js)](https://nextjs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
@@ -21,37 +20,46 @@
 ## 🔥 Features at a Glance
 
 ### 👤 User Management
+
 - **Secure Authentication**: Powered by NextAuth.js for email/password logins
-- **Rich User Profiles**: Customize with avatars, bios, and social links
-- **Personal Dashboard**: Manage your activity, posts, and followers
+- **User Profiles**: Customize with avatars, bios, and personal social links , changing password and username
+- **Personal Dashboard**: Manage your activity and posts
 
 ### 🔄 Social Interaction
-- **Multimedia Posts**: Share text, images, and videos effortlessly
+
+- **Multimedia Posts**: Share text, images, and videos
 - **Personalized Feed**: Curated timeline with fresh content
 - **Content Filtering**: Switch between global and personal feeds
 - **Smart Search**: Find users and trending content instantly
 
 ### 📸 Media Handling
+
 - **Seamless Uploads**: Effortlessly share and view media
 - **Profile Customization**: Set personalized avatars and backgrounds
 - **Integrated Media Viewer**: Watch videos and images in-app
 
 ### 💻 Stunning UI/UX
+
 - **Responsive Design**: Works seamlessly on all devices
 - **Light & Dark Modes**: Choose your preferred theme
+- **Shadcn Library**: Clean and beautiful Componennts
 - **Real-Time Updates**: Instant notifications for new content
+
+### 🎨 System Design
+
+![Social-media system design](/public//socialmedia.svg)
 
 ---
 
 ## 🛠️ Tech Stack
 
-| Frontend | Backend | Optimization |
-|----------|---------|--------------|
-| Next.js (SSR & SSG) | Next.js API Routes | Lazy Loading |
-| TypeScript | Prisma ORM | Batch Processing |
-| Tailwind CSS | PostgreSQL | Efficient Caching |
-| Radix UI | AWS S3 | Parallel Processing |
-| Lucide React | NextAuth.js | Error Handling |
+| Frontend            | Backend            | Optimization        |
+| ------------------- | ------------------ | ------------------- |
+| Next.js (SSR & SSG) | Next.js API Routes | Lazy Loading        |
+| TypeScript          | Prisma ORM         | Batch Processing    |
+| Tailwind CSS        | PostgreSQL         | Efficient Caching   |
+| Radix UI            | AWS S3             | Parallel Processing |
+| Lucide React        | NextAuth.js        | Error Handling      |
 
 ---
 
@@ -59,20 +67,22 @@
 
 ```bash
 /
-├── app/                 # Next.js App Directory
-│   ├── api/             # API Routes
-│   ├── account/         # User Account Management
-│   ├── dashboard/       # User Dashboards
-│   ├── profile/         # User Profile Pages
-│   ├── search/          # Search Functionality
-├── components/          # Reusable UI Components
-├── hooks/               # Custom React Hooks
-├── prisma/              # Prisma Schema & Migrations
-├── public/              # Static Assets
-└── ...                  # Configuration Files
+├── app/
+│   ├── api/
+│   ├── account/
+│   ├── dashboard/
+│   ├── profile/
+│   ├── search/
+├── components/
+├── hooks/
+├── prisma/
+├── public/
+└── ...
 ```
 
----
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 700">
+ 
+</svg>
 
 ## ⚡ Avatar Optimization Flow
 
@@ -86,16 +96,18 @@ graph TD
 ```
 
 ### 🚀 Benefits:
+
 ✔ **Reduced API Calls** – Batch processing minimizes network requests  
 ✔ **Lightning-Fast Performance** – Optimized avatar loading for a smooth experience  
 ✔ **Smart Caching** – Avoids redundant image fetches  
-✔ **Parallel Processing** – Efficiently loads user profiles  
+✔ **Parallel Processing** – Efficiently loads user profiles
 
 ---
 
 ## 🚦 Getting Started
 
 ### Prerequisites
+
 - Node.js (v18+ recommended)
 - PostgreSQL database
 - AWS S3 bucket for media storage
@@ -117,12 +129,12 @@ pnpm dev
 
 ## 🌐 Deployment Options
 
-| Platform | Description |
-|----------|-------------|
-| ![Vercel](https://example.com/vercel-icon.svg) **Vercel** | Optimized for Next.js with one-click deployment |
-| ![AWS](https://example.com/aws-icon.svg) **AWS** | Scalable deployment with EC2, ECS, or Lambda |
+| Platform                                                  | Description                                      |
+| --------------------------------------------------------- | ------------------------------------------------ |
+| ![Vercel](https://example.com/vercel-icon.svg) **Vercel** | Optimized for Next.js with one-click deployment  |
+| ![AWS](https://example.com/aws-icon.svg) **AWS**          | Scalable deployment with EC2, ECS, or Lambda     |
 | ![Heroku](https://example.com/heroku-icon.svg) **Heroku** | Simplified PostgreSQL hosting and app deployment |
-| ![Docker](https://example.com/docker-icon.svg) **Docker** | Containerized deployment for consistency |
+| ![Docker](https://example.com/docker-icon.svg) **Docker** | Containerized deployment for consistency         |
 
 ```bash
 # Production Build
@@ -164,6 +176,6 @@ This project is licensed under the MIT License. See the **LICENSE** file for det
   
   **Built with ❤️ by the SocialConnect Team**
   
-  [🌍 Website](https://example.com) • [📖 Documentation](https://example.com/docs) • [📧 Support](mailto:support@example.com)
+  [🌍 Website](https://quick-post-phi.vercel.app/)  • [📧 Support](mailto:kartik200421@gmail.com)
   
 </div>
