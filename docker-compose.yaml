@@ -1,24 +1,36 @@
 version: "3.8"
 services:
   nextjs:
-    image: node:alpine
-    working_dir: /app
+    build: .
+    container_name: nextjs-app
     ports:
-      - 3000:3000
+      - "3000:3000"
     depends_on:
       - postgres
+    working_dir: /app
     volumes:
-      - ./:/app
-    env_file:
-      - .env
-    command: sh -c "npm install && npx prisma generate && npm run dev"
+      - .:/app
+      - /app/node_modules
+    environment:
+      - DATABASE_URL=postgresql://kartik:2004@postgres:5432/socialmedia
+      - GOOGLE_ID=${GOOGLE_ID}
+      - GOOGLE_SECRET=${GOOGLE_SECRET}
+      - BUCKET_NAME=${BUCKET_NAME}
+      - BUCKET_POST_NAME=${BUCKET_POST_NAME}
+      - BUCKET_REGION=${BUCKET_REGION}
+      - ACCESS_KEY=${ACCESS_KEY}
+      - SECRET_ACCESS_KEY=${SECRET_ACCESS_KEY}
 
   postgres:
     image: postgres:15
+    container_name: postgres-db
+    restart: always
     ports:
-      - 5432:5432
-    env_file:
-      - .env
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=kartik
+      - POSTGRES_PASSWORD=2004
+      - POSTGRES_DB=socialmedia
     volumes:
       - postgres-data:/var/lib/postgresql/data
 
