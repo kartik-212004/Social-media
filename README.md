@@ -118,9 +118,8 @@ graph TD
 ```bash
 git clone https://github.com/yourusername/socialconnect.git
 cd socialconnect
-pnpm install
-pnpm exec prisma migrate dev
-pnpm dev
+npm install
+npm run dev
 ```
 
 🔗 Open **[http://localhost:3000](http://localhost:3000)** to explore SocialConnect.
@@ -129,17 +128,15 @@ pnpm dev
 
 ## 🌐 Deployment Options
 
-| Platform                                                  | Description                                      |
-| --------------------------------------------------------- | ------------------------------------------------ |
-| ![Vercel](https://example.com/vercel-icon.svg) **Vercel** | Optimized for Next.js with one-click deployment  |
-| ![AWS](https://example.com/aws-icon.svg) **AWS**          | Scalable deployment with EC2, ECS, or Lambda     |
-| ![Heroku](https://example.com/heroku-icon.svg) **Heroku** | Simplified PostgreSQL hosting and app deployment |
-| ![Docker](https://example.com/docker-icon.svg) **Docker** | Containerized deployment for consistency         |
+- <img src="https://assets.vercel.com/image/upload/front/favicon/vercel/favicon.ico" alt="Vercel" width="20" height="20"> **Vercel** | Optimized for Next.js with one-click deployment |
+- <img src="https://aws.amazon.com/favicon.ico" alt="AWS" width="20" height="20"> **AWS** | Scalable deployment with EC2, ECS, or Lambda |
+- <img src="https://www.postgresql.org/favicon.ico" alt="Heroku" width="20" height="20"> **Heroku** | Simplified PostgreSQL hosting and app deployment |
+- <img src="https://www.docker.com/wp-content/uploads/2022/03/Moby-logo.png" alt="Docker" width="20" height="20"> **Docker** | Containerized deployment for consistency |
 
 ```bash
 # Production Build
-pnpm build
-pnpm start
+npm run build
+npm run start
 ```
 
 ---
