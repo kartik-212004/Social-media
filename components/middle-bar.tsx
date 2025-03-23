@@ -283,7 +283,12 @@ export default function Middlebar() {
           <div className="mt-2 flex items-center space-x-3">
             <Heart className="text-zinc-500 hover:text-red-500 cursor-pointer" />
             {post.imageUrl && (
-              <Link className="text-zinc-500" href={post.imageUrl}>
+              <Link
+                className="text-zinc-500"
+                target="_blank"
+                rel="noopener noreferrer"
+                href={post.imageUrl}
+              >
                 <ExternalLink />
               </Link>
             )}
@@ -376,13 +381,11 @@ export default function Middlebar() {
 
               <button
                 onClick={() => fileInputRef.current?.click()}
-                className="sm:hidden p-2 bg-gray-200 rounded-full hover:bg-gray-300 transition"
+                className="sm:hidden p-2 bg-gray-200 dark:bg-[#030303] rounded-full hover:bg-gray-300 dark:hover:bg-gray-700 transition"
               >
                 <Gallery
-                  className="w-6 h-6 dark:bg-black text-blue-500 dark:text-blue-400"
+                  className="w-6 h-6 text-black dark:text-white"
                   strokeWidth={1.5}
-                  style={{ fill: "black" }}
-                  fill="black"
                 />
               </button>
 
