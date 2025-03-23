@@ -20,4 +20,4 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           push: true
-          tags: kartik200421/portfolio:latest
+          tags: kartik200421/quick-post:latest
