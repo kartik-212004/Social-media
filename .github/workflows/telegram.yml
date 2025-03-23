@@ -7,10 +7,6 @@ on:
   pull_request:
     branches:
       - main
-  workflow_run:
-    workflows: [ "Telegram Notifications" ]
-    types:
-      - completed
 
 jobs:
   notify:
@@ -23,4 +19,4 @@ jobs:
         with:
           botToken: ${{ secrets.BotToken }}
           chatId: ${{ secrets.ChatID }}
-          jobStatus: ${{ job.status }}
+          jobStatus: "GitHub Actions Status: ${{ job.status }}"
