@@ -9,7 +9,6 @@ import { Input } from "./ui/input";
 import { ExternalLink } from "lucide-react";
 import { useProfileImage } from "@/hooks/useProfileImage";
 import { useRouter } from "next/navigation";
-import Image from "next/image";
 import Link from "next/link";
 // import { useUserImage } from "@/hooks/useAwsImage";
 
