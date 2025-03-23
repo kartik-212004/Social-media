@@ -145,9 +145,9 @@ export default function Profile() {
   };
 
   return (
-    <div className="min-h-screen w-2/3 dark:border-zinc-800 border-l-2 p-6">
-      <div className="w-full mb-8">
-        <div className="flex">
+    <div className="min-h-screen md:w-2/3 w-full dark:border-zinc-800 border-l-2 border-r-2">
+      <div className="w-full  mb-8">
+        <div className="flex p-3 border-b-2 dark:border-zinc-800 ">
           <button
             className={`py-3 px-6 font-medium text-center flex-1 `}
             onClick={() => setActiveTab("dashboard")}
