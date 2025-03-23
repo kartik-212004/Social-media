@@ -8,6 +8,8 @@ set -e
 echo "Installing dependencies"
 npm install
 
+echo "hello there"
+
 echo "🔧 Generating Prisma client"
 npx prisma generate
 
