@@ -9,6 +9,7 @@ import { Input } from "./ui/input";
 import { ExternalLink } from "lucide-react";
 import { useProfileImage } from "@/hooks/useProfileImage";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 import Link from "next/link";
 // import { useUserImage } from "@/hooks/useAwsImage";
 
@@ -254,7 +255,9 @@ export default function Middlebar() {
               {post.mimeType?.startsWith("video/") ? (
                 <video
                   onDoubleClick={() => {
-                    window.open(post.imageUrl, "_blank");
+                    if (post.imageUrl) {
+                      window.open(post.imageUrl, "_blank");
+                    }
                   }}
                   muted
                   className="w-full max-h-[60vh] rounded-xl object-cover"
@@ -264,7 +267,9 @@ export default function Middlebar() {
               ) : (
                 <img
                   onDoubleClick={() => {
-                    window.open(post.imageUrl, "_blank");
+                    if (post.imageUrl) {
+                      window.open(post.imageUrl, "_blank");
+                    }
                   }}
                   className="w-full max-h-[60vh] rounded-xl object-cover"
                   src={post.imageUrl}
