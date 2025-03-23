@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import SessionProviders from "./Provider";
-import BottomNavbar from "@/components/navbar";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/toaster";
@@ -44,7 +43,6 @@ export default function RootLayout({
           </ThemeProvider>
         </SessionProviders>
         <Toaster />
-        <BottomNavbar />
       </body>
     </html>
   );
