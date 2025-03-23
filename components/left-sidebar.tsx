@@ -76,7 +76,7 @@ export default function Sidebar() {
   }
 
   return (
-    <div className="w-1/3 flex flex-col justify-end items-end">
+    <div className="w-1/3 hidden flex-col justify-end items-end lg:flex ">
       <div className="py-6 top-0  fixed pr-10 flex flex-col min-h-screen justify-between items-end">
         <ul className="space-y-2 ">
           {sidebarData.map((item) => (

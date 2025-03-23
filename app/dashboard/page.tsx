@@ -141,7 +141,7 @@ export default function Dashboard() {
     );
 
   return (
-    <div className="w-2/3 min-h-screen dark:border-zinc-800 border-x-2 p-8">
+    <div className="xl:w-2/3 w-full  min-h-screen dark:border-zinc-800 border-x-2 p-8">
       <div className="max-w-2xl mx-auto">
         <div className="flex flex-col h-min justify-center pb-6 border-b dark:border-zinc-800 mb-6">
           <div className="flex items-center gap-4">

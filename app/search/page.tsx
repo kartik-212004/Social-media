@@ -9,7 +9,9 @@ import { useRouter } from "next/navigation";
 export default function Explore() {
   const [search, setSearch] = useState("");
   const [names, setNames] = useState<{ id: string; name: string }[]>([]);
-  const [suggestedUsers, setSuggestedUsers] = useState<{ id: string; name: string }[]>([]);
+  const [suggestedUsers, setSuggestedUsers] = useState<
+    { id: string; name: string }[]
+  >([]);
   const router = useRouter();
 
   useEffect(() => {
@@ -40,7 +42,7 @@ export default function Explore() {
         );
 
   return (
-    <div className="py-16 h-screen w-[60%] dark:border-zinc-800 border-x-2">
+    <div className="py-16 h-screen md:w-[60%] w-full dark:border-zinc-800 border-x-2">
       <div className="flex flex-row items-center justify-center space-x-2">
         <Search />
         <input
