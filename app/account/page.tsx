@@ -22,6 +22,8 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useSession } from "next-auth/react";
 import axios from "axios";
 import { useToast } from "@/hooks/use-toast";
+import { LogOut } from "lucide-react";
+import { signOut } from "next-auth/react";
 import { useProfileImage } from "@/hooks/useProfileImage";
 import useFetchUserPassword from "@/hooks/check-password";
 
@@ -220,6 +222,23 @@ export default function Account() {
           <div className="flex xl:h-40 h-20 flex-col justify-center space-y-1">
             <h1 className="text-xl">{username}</h1>
             <h6 className="text-lg">{session.user.email}</h6>
+            <div className="md:flex hidden space-x-3 flex-row py-2">
+              <LogOut
+                onClick={() => {
+                  signOut({ callbackUrl: "/signin" });
+                  toast({ title: "Logged Out" });
+                }}
+              />
+              <span
+                onClick={() => {
+                  signOut({ callbackUrl: "/signin" });
+                  toast({ title: "Logged Out" });
+                }}
+                className="text-red-500 font-semibold"
+              >
+                Logout
+              </span>
+            </div>
           </div>
         </div>
 
