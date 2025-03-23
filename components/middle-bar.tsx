@@ -6,8 +6,10 @@ import Loading from "@/app/loading";
 import { useToast } from "@/hooks/use-toast";
 import axios from "axios";
 import { Input } from "./ui/input";
+import { ExternalLink } from "lucide-react";
 import { useProfileImage } from "@/hooks/useProfileImage";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 // import { useUserImage } from "@/hooks/useAwsImage";
 
 type Post = {
@@ -251,6 +253,9 @@ export default function Middlebar() {
             <>
               {post.mimeType?.startsWith("video/") ? (
                 <video
+                  onDoubleClick={() => {
+                    window.open(post.imageUrl, "_blank");
+                  }}
                   muted
                   className="w-full max-h-[60vh] rounded-xl object-cover"
                   src={post.imageUrl}
@@ -258,6 +263,9 @@ export default function Middlebar() {
                 />
               ) : (
                 <img
+                  onDoubleClick={() => {
+                    window.open(post.imageUrl, "_blank");
+                  }}
                   className="w-full max-h-[60vh] rounded-xl object-cover"
                   src={post.imageUrl}
                   alt={`Post by ${post.user?.name}`}
@@ -267,8 +275,11 @@ export default function Middlebar() {
             </>
           )}
 
-          <div className="mt-2 flex items-center space-x-2">
+          <div className="mt-2 flex items-center space-x-3">
             <Heart className="text-zinc-500 hover:text-red-500 cursor-pointer" />
+            <Link className="text-zinc-500" href={post.imageUrl || "$"}>
+              <ExternalLink />
+            </Link>
             <span className="text-zinc-500">0</span>
             {!tabBar && (
               <span
