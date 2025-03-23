@@ -222,7 +222,7 @@ export default function Account() {
           <div className="flex xl:h-40 h-20 flex-col justify-center space-y-1">
             <h1 className="text-xl">{username}</h1>
             <h6 className="text-lg">{session.user.email}</h6>
-            <div className="md:flex hidden space-x-3 flex-row py-2">
+            <div className="md:hidden flex space-x-3 flex-row py-2">
               <LogOut
                 onClick={() => {
                   signOut({ callbackUrl: "/signin" });
