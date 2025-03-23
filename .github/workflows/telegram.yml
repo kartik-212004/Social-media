@@ -1,0 +1,26 @@
+name: Telegram Notifications
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  workflow_run:
+    workflows: [ "Telegram Notifications" ]
+    types:
+      - completed
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Send Telegram Notification
+        if: always()
+        uses: xinthink/action-telegram@v1.1
+        with:
+          botToken: ${{ secrets.BotToken }}
+          chatId: ${{ secrets.ChatID }}
+          jobStatus: ${{ job.status }}
