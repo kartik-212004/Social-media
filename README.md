@@ -1,4 +1,4 @@
-# 🚀 QUICK POST
+# 🚀 QUICK POST <img src="https://quick-post-phi.vercel.app/favicon.ico" height=50>
 
 <div align="center">
 
@@ -88,13 +88,50 @@
 - AWS S3 bucket for media storage
 - pnpm
 
-### Installation
+### Classis Installation
+
+Cloning the repo
 
 ```bash
 git clone https://github.com/yourusername/socialmedia.git
+```
+
+Directing to the folder
+
+```bash
 cd socialmedia
+```
+
+Installing dependencies
+
+```bash
 npm install
+```
+
+Running the application
+
+```bash
 npm run dev
+```
+
+### Using Docker
+
+Cloning the Repo:
+
+```bash
+git clone https://github.com/yourusername/socialmedia.git
+```
+
+Using Docker compose to Build the image:
+
+```bash
+docker compose up --build
+```
+
+Do stop the containers use this command:
+
+```bash
+docker compsose down
 ```
 
 🔗 Open **[http://localhost:3000](http://localhost:3000)** to explore socialmedia.
@@ -114,27 +151,13 @@ npm run build
 npm run start
 ```
 
----
-
-## 👥 Contributing
-
-We welcome contributions to socialmedia! 🚀
-
-1. Fork the repository
-2. Create a new branch: `git checkout -b feature/amazing-feature`
-3. Commit your changes: `git commit -m 'Add some amazing feature'`
-4. Push to GitHub: `git push origin feature/amazing-feature`
-5. Open a Pull Request
-
----
-
 ## 📄 License
 
 This project is licensed under the MIT License. See the **LICENSE** file for details.
 
 ---
 
-## 🙏 Acknowledgements
+## Acknowledgements
 
 - <img src="https://assets.vercel.com/image/upload/front/favicon/vercel/favicon.ico" alt="nextjs" width="20" height="20"> [Next.js](https://nextjs.org/) - The React framework for production
 - <img src="https://www.prisma.io/images/favicon-32x32.png" alt="prisma" width="20" height="20"> [Prisma](https://www.prisma.io/) - Next-generation ORM
@@ -149,6 +172,9 @@ This project is licensed under the MIT License. See the **LICENSE** file for det
   
   **Built with ❤️ by the socialmedia Team**
   
-  [🌍 Website](https://quick-post-phi.vercel.app/)  • [📧 Support](mailto:kartik200421@gmail.com)
-  
+  <img src="https://quick-post-phi.vercel.app/favicon.ico
+  " width="20"> [Quickpost](https://quick-post-phi.vercel.app/)
+
+<img src="https://ssl.gstatic.com/ui/v1/icons/mail/rfr/gmail.ico" width="20"> • [ Support](mailto:kartik200421@gmail.com)
+
 </div>
