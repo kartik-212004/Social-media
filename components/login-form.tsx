@@ -29,7 +29,7 @@ export function LoginForm({
 
     if (handle?.ok) {
       toast({ title: "Successfully Logged In" });
-      router.push("/");
+      router.replace("/");
     } else {
       toast({ title: handle?.error || "Incorrect Password" });
     }
