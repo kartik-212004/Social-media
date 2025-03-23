@@ -286,6 +286,7 @@ export default function Middlebar() {
               <Link
                 className="text-zinc-500"
                 target="_blank"
+                rel="noopener noreferrer"
                 href={post.imageUrl}
               >
                 <ExternalLink />
