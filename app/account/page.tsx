@@ -138,7 +138,7 @@ export default function Account() {
 
   return (
     <div className="container mx-auto flex flex-row">
-      <div className="flex w-5/6 dark:border-zinc-800 border-l-2 min-h-screen p-16 space-y-4 relative flex-col">
+      <div className="flex md:w-5/6 w-full dark:border-zinc-800 border-l-2 min-h-screen md:p-16 p-8 space-y-4 relative flex-col">
         <div className="absolute inset-0 -z-10">
           <Particles
             particleColors={["#ffffff", "#ffffff"]}
@@ -154,7 +154,7 @@ export default function Account() {
 
         <h1 className="text-3xl pb-4">Account Settings</h1>
 
-        <div className="flex space-x-8 flex-row items-start">
+        <div className="flex space-x-8 items-center flex-row ">
           <Dialog open={previewOpen} onOpenChange={setPreviewOpen}>
             <DialogContent
               style={{
@@ -217,7 +217,7 @@ export default function Account() {
             disabled={isUploading}
           />
 
-          <div className="flex h-40 flex-col justify-center space-y-1">
+          <div className="flex xl:h-40 h-20 flex-col justify-center space-y-1">
             <h1 className="text-xl">{username}</h1>
             <h6 className="text-lg">{session.user.email}</h6>
           </div>

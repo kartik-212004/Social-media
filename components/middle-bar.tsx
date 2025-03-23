@@ -6,7 +6,8 @@ import Loading from "@/app/loading";
 import { useToast } from "@/hooks/use-toast";
 import axios from "axios";
 import { Input } from "./ui/input";
-import { ExternalLink } from "lucide-react";
+import { Image as Gallery } from "lucide-react";
+import { ExternalLink, File } from "lucide-react";
 import { useProfileImage } from "@/hooks/useProfileImage";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
@@ -209,7 +210,7 @@ export default function Middlebar() {
     post && (
       <div
         key={post.id}
-        className="p-4 px-6 hover:bg-zinc-100 dark:hover:bg-[#070707] transition-colors duration-200 flex items-start space-x-4"
+        className="p-4 px-6 hover:bg-zinc-100 dark:hover:bg-[#070707] transition-colors duration-200  flex items-start space-x-4"
       >
         <Avatar
           className="mt-2 cursor-pointer"
@@ -301,7 +302,7 @@ export default function Middlebar() {
     );
 
   return (
-    <div className="border-x-2 min-h-screen dark:border-zinc-800 w-1/2 relative">
+    <div className="border-x-2 min-h-screen dark:border-zinc-800 xl:w-1/2 w-full relative">
       <div className="sticky top-0 z-50 dark:bg-darktheme bg-white">
         <div className="flex border-y-2 dark:border-zinc-800 flex-row w-full">
           <button
@@ -370,16 +371,29 @@ export default function Middlebar() {
                 onChange={(e) => setFile(e.target.files?.[0] || null)}
                 type="file"
                 accept="image/*,video/*"
-                className="py-2 w-[35%] text-blue-400 px-5 rounded-3xl font-medium"
+                className="py-2 w-[35%] text-blue-400 px-5 rounded-3xl font-medium hidden sm:block"
               />
+
+              <button
+                onClick={() => fileInputRef.current?.click()}
+                className="sm:hidden p-2 bg-gray-200 rounded-full hover:bg-gray-300 transition"
+              >
+                <Gallery
+                  className="w-6 h-6 dark:bg-black text-blue-500 dark:text-blue-400"
+                  strokeWidth={1.5}
+                  style={{ fill: "black" }}
+                  fill="black"
+                />
+              </button>
+
               <button
                 onClick={handlePost}
                 disabled={!caption.trim() || isPosting}
                 className="py-2 px-5 rounded-3xl font-medium 
-                bg-blue-500 text-white 
-                hover:bg-blue-600 
-                disabled:opacity-50 disabled:cursor-not-allowed 
-                transition-colors"
+      bg-blue-500 text-white 
+      hover:bg-blue-600 
+      disabled:opacity-50 disabled:cursor-not-allowed 
+      transition-colors"
               >
                 {isPosting ? "Posting..." : "POST"}
               </button>
