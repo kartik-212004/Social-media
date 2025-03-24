@@ -21,10 +21,10 @@ export async function POST(req: NextRequest) {
     const email = formData.get("email") as string;
 
     if (file instanceof File) {
-      const MAX_FILE_SIZE = 40 * 1024 * 1024;
+      const MAX_FILE_SIZE = 50 * 1024 * 1024;
       if (file.size > MAX_FILE_SIZE) {
         return NextResponse.json(
-          { message: "File size exceeds 40 MB limit" },
+          { message: "File size exceeds 50 MB limit" },
           { status: 400 }
         );
       }
