@@ -24,7 +24,7 @@ export default function Explore() {
       const users = response.data.Users;
       setNames(users);
       const shuffled = [...users].sort(() => 0.5 - Math.random());
-      setSuggestedUsers(shuffled.slice(0, 34));
+      setSuggestedUsers(shuffled.slice(0, 4));
     } catch (error) {
       console.error(error);
     }
