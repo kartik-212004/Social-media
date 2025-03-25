@@ -281,7 +281,7 @@ export default function Middlebar() {
           )}
 
           <div className="mt-2 flex items-center space-x-3">
-            <Heart className="text-zinc-500 hover:text-red-500 cursor-pointer" />
+            {/* <Heart className="text-zinc-500 hover:text-red-500 cursor-pointer" /> */}
             {post.imageUrl && (
               <Link
                 className="text-zinc-500"
