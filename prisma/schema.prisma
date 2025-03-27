@@ -10,7 +10,7 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
+  url      = env("LOCAL_DATABASE_URL")
 }
 
 model user {
@@ -24,6 +24,7 @@ model user {
   link      Link[]
   imageName String?
   imageUrl  String?
+  Like      Like[]
 }
 
 model Post {
@@ -35,6 +36,7 @@ model Post {
   user      user?    @relation(fields: [userId], references: [id])
   postName  String?
   userId    String?
+  Like      Like[]
 }
 
 model Link {
@@ -42,4 +44,12 @@ model Link {
   url    String  @unique
   user   user?   @relation(fields: [userId], references: [id])
   userId String?
+}
+
+model Like {
+  id     String  @id @default(uuid())
+  user   user?   @relation(fields: [userId], references: [id])
+  userId String?
+  post   Post?   @relation(fields: [postId], references: [id])
+  postId String?
 }

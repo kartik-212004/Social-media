@@ -35,6 +35,7 @@ type PostWithImage = Post & {
 
 export default function Middlebar() {
   const { imageUrl } = useProfileImage();
+  const [Like, setLike] = useState();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
   const { data: session } = useSession();
@@ -80,8 +81,18 @@ export default function Middlebar() {
     }
   }, []);
 
-  const handleLike = () => {
-    console.log(session?.user?.email);
+  const handleLike = async (postId: string, userId: string) => {
+    // console.log(session?.user?.email);
+    console.log(postId, userId);
+    try {
+      const response = await axios.post("/api/like", { postId, userId });
+      const data = response.data;
+
+      toast({ title: data.message });
+      setLike(data.message);
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
@@ -303,9 +314,15 @@ export default function Middlebar() {
 
           <div className="mt-2 flex items-center space-x-3">
             <Heart
-              onClick={handleLike}
-              className="text-zinc-500 hover:text-red-500 cursor-pointer"
+              onClick={() => {
+                if (!post.user?.id) return;
+                handleLike(post.id, post.user.id);
+              }}
+              className={`text-zinc-500 cursor-pointer ${
+                Like === "Liked" ? "hover:text-red-500" : ""
+              }`}
             />
+
             {post.imageUrl && (
               <Link
                 className="text-zinc-500"
