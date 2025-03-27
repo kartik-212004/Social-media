@@ -1,7 +1,7 @@
 import { useSession } from "next-auth/react";
 import { Avatar, AvatarImage, AvatarFallback } from "./ui/avatar";
 import { Camera, Heart, Trash2Icon } from "lucide-react";
-import { useEffect, useRef, useState, useCallback, useMemo } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 import Image from "next/image";
 import Loading from "@/app/loading";
 import { useToast } from "@/hooks/use-toast";
