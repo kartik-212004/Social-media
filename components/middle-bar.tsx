@@ -1,7 +1,7 @@
 import { useSession } from "next-auth/react";
 import { Avatar, AvatarImage, AvatarFallback } from "./ui/avatar";
 import { Camera, Heart, Trash2Icon } from "lucide-react";
-import { useEffect, useRef, useState, useCallback } from "react";
+import { useEffect, useRef, useState, useCallback, useMemo } from "react";
 import Image from "next/image";
 import Loading from "@/app/loading";
 import { useToast } from "@/hooks/use-toast";
@@ -49,11 +49,12 @@ export default function Middlebar() {
   const [isLoadingUserPosts, setIsLoadingUserPosts] = useState(true);
   const router = useRouter();
   const processedUserIds = useRef<Set<string>>(new Set());
+  const avatarUrlCache = useRef<Record<string, string>>({});
 
   const fetchUserAvatars = useCallback(async (posts: PostWithImage[]) => {
     const userIds = posts
       .filter(
-        (post) => post.user?.id && !processedUserIds.current.has(post.user.id)
+        (post) => post.user?.id && !avatarUrlCache.current[post.user.id]
       )
       .map((post) => post.user!.id!) as string[];
 
@@ -65,17 +66,14 @@ export default function Middlebar() {
       });
       const avatarUrls = response.data.avatarUrls || {};
 
-      userIds.forEach((id) => processedUserIds.current.add(id));
-
-      return posts.map((post) => {
-        if (post.user?.id && avatarUrls[post.user.id]) {
-          return {
-            ...post,
-            userAvatarUrl: avatarUrls[post.user.id],
-          };
-        }
-        return post;
+      Object.entries(avatarUrls).forEach(([id, url]) => {
+        avatarUrlCache.current[id] = url as string;
       });
+
+      return posts.map((post) => ({
+        ...post,
+        userAvatarUrl: post.user?.id ? avatarUrlCache.current[post.user.id] : undefined,
+      }));
     } catch (error) {
       console.error("Failed to fetch user avatars:", error);
       return posts;
@@ -107,7 +105,7 @@ export default function Middlebar() {
   );
 
   const fetchPosts = useCallback(async () => {
-    setIsLoadingPublicPosts(true);
+    if (!isLoadingPublicPosts) setIsLoadingPublicPosts(true);
     try {
       const response = await axios.get("/api/posts/public-posts");
       const posts = response.data.post;
@@ -129,7 +127,7 @@ export default function Middlebar() {
   }, [toast, fetchUserAvatars]);
 
   const fetchUserPost = useCallback(async () => {
-    setIsLoadingUserPosts(true);
+    if (!isLoadingUserPosts) setIsLoadingUserPosts(true);
     try {
       const response = await axios.post("/api/posts/user-posts", {
         email: session?.user?.email,
@@ -162,12 +160,16 @@ export default function Middlebar() {
       formData.append("email", session?.user?.email ?? "");
       formData.append("caption", caption);
 
-      await axios.post("/api/posts/upload", formData, {
+      const response = await axios.post("/api/posts/upload", formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
 
-      await fetchPosts();
-      await fetchUserPost();
+      if (tabBar) {
+        await fetchPosts();
+      } else {
+        await fetchUserPost();
+      }
+
       setCaption("");
       if (fileInputRef.current) {
         fileInputRef.current.value = "";
@@ -180,7 +182,7 @@ export default function Middlebar() {
     } finally {
       setIsPosting(false);
     }
-  }, [caption, file, session?.user?.email, fetchPosts, fetchUserPost, toast]);
+  }, [caption, file, session?.user?.email, fetchPosts, fetchUserPost, toast, tabBar]);
 
   const DeletePost = async (id: string) => {
     try {
@@ -196,9 +198,12 @@ export default function Middlebar() {
   };
 
   useEffect(() => {
-    fetchPosts();
-    fetchUserPost();
-  }, [fetchPosts, fetchUserPost]);
+    if (tabBar) {
+      fetchPosts();
+    } else {
+      fetchUserPost();
+    }
+  }, [tabBar, fetchPosts, fetchUserPost]);
 
   const handleUserClick = (userId: string | undefined) => {
     if (userId) {
@@ -211,11 +216,13 @@ export default function Middlebar() {
     }
   };
 
-  const renderPostItem = (post: PostWithImage) =>
-    post && (
+  const renderPostItem = useCallback((post: PostWithImage) => {
+    if (!post) return null;
+
+    return (
       <div
         key={post.id}
-        className="p-4 px-6 hover:bg-zinc-100 dark:hover:bg-[#070707] transition-colors duration-200  flex items-start space-x-4"
+        className="p-4 px-6 hover:bg-zinc-100 dark:hover:bg-[#070707] transition-colors duration-200 flex items-start space-x-4"
       >
         <Avatar
           className="mt-2 cursor-pointer"
@@ -260,28 +267,29 @@ export default function Middlebar() {
               {post.mimeType?.startsWith("video/") ? (
                 <video
                   onDoubleClick={() => {
-                    if (post.imageUrl) {
-                      window.open(post.imageUrl, "_blank");
-                    }
+                    if (post.imageUrl) window.open(post.imageUrl, "_blank");
                   }}
                   muted
                   className="w-full max-h-[60vh] rounded-xl object-cover"
                   src={post.imageUrl}
                   controls
+                  loading="lazy"
                 />
               ) : (
-                <Image
-                  onDoubleClick={() => {
-                    if (post.imageUrl) {
-                      window.open(post.imageUrl, "_blank");
-                    }
-                  }}
-                  className="w-full max-h-[60vh] rounded-xl object-cover"
-                  height={500}
-                  width={500}
-                  src={post.imageUrl}
-                  alt={`Post by ${post.user?.name}`}
-                />
+                <div className="relative w-full aspect-video">
+                  <Image
+                    onDoubleClick={() => {
+                      if (post.imageUrl) window.open(post.imageUrl, "_blank");
+                    }}
+                    className="rounded-xl object-cover"
+                    fill
+                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                    priority={false}
+                    src={post.imageUrl}
+                    alt={`Post by ${post.user?.name}`}
+                    loading="lazy"
+                  />
+                </div>
               )}
             </>
           )}
@@ -314,6 +322,7 @@ export default function Middlebar() {
         </div>
       </div>
     );
+  }, []);
 
   return (
     <div className="border-x-2 min-h-screen dark:border-zinc-800 xl:w-1/2 w-full relative">
