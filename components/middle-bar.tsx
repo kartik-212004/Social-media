@@ -281,7 +281,6 @@ export default function Middlebar() {
                   width={500}
                   src={post.imageUrl}
                   alt={`Post by ${post.user?.name}`}
-                  loading="lazy"
                 />
               )}
             </>
