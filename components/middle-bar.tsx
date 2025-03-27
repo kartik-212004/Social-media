@@ -48,14 +48,12 @@ export default function Middlebar() {
   const [isLoadingPublicPosts, setIsLoadingPublicPosts] = useState(true);
   const [isLoadingUserPosts, setIsLoadingUserPosts] = useState(true);
   const router = useRouter();
-  const processedUserIds = useRef<Set<string>>(new Set());
+  useRef<Set<string>>(new Set());
   const avatarUrlCache = useRef<Record<string, string>>({});
 
   const fetchUserAvatars = useCallback(async (posts: PostWithImage[]) => {
     const userIds = posts
-      .filter(
-        (post) => post.user?.id && !avatarUrlCache.current[post.user.id]
-      )
+      .filter((post) => post.user?.id && !avatarUrlCache.current[post.user.id])
       .map((post) => post.user!.id!) as string[];
 
     if (userIds.length === 0) return posts;
@@ -72,7 +70,9 @@ export default function Middlebar() {
 
       return posts.map((post) => ({
         ...post,
-        userAvatarUrl: post.user?.id ? avatarUrlCache.current[post.user.id] : undefined,
+        userAvatarUrl: post.user?.id
+          ? avatarUrlCache.current[post.user.id]
+          : undefined,
       }));
     } catch (error) {
       console.error("Failed to fetch user avatars:", error);
@@ -160,7 +160,7 @@ export default function Middlebar() {
       formData.append("email", session?.user?.email ?? "");
       formData.append("caption", caption);
 
-      const response = await axios.post("/api/posts/upload", formData, {
+      await axios.post("/api/posts/upload", formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
 
@@ -182,7 +182,15 @@ export default function Middlebar() {
     } finally {
       setIsPosting(false);
     }
-  }, [caption, file, session?.user?.email, fetchPosts, fetchUserPost, toast, tabBar]);
+  }, [
+    caption,
+    file,
+    session?.user?.email,
+    fetchPosts,
+    fetchUserPost,
+    toast,
+    tabBar,
+  ]);
 
   const DeletePost = async (id: string) => {
     try {
@@ -273,7 +281,6 @@ export default function Middlebar() {
                   className="w-full max-h-[60vh] rounded-xl object-cover"
                   src={post.imageUrl}
                   controls
-                  loading="lazy"
                 />
               ) : (
                 <div className="relative w-full aspect-video">
