@@ -2,6 +2,7 @@ import { useSession } from "next-auth/react";
 import { Avatar, AvatarImage, AvatarFallback } from "./ui/avatar";
 import { Camera, Heart, Trash2Icon } from "lucide-react";
 import { useEffect, useRef, useState, useCallback } from "react";
+import Image from "next/image";
 import Loading from "@/app/loading";
 import { useToast } from "@/hooks/use-toast";
 import axios from "axios";
@@ -80,6 +81,10 @@ export default function Middlebar() {
       return posts;
     }
   }, []);
+
+  const handleLike = () => {
+    console.log(session?.user?.email);
+  };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === "Enter" && !e.shiftKey) {
@@ -265,13 +270,15 @@ export default function Middlebar() {
                   controls
                 />
               ) : (
-                <img
+                <Image
                   onDoubleClick={() => {
                     if (post.imageUrl) {
                       window.open(post.imageUrl, "_blank");
                     }
                   }}
                   className="w-full max-h-[60vh] rounded-xl object-cover"
+                  height={500}
+                  width={500}
                   src={post.imageUrl}
                   alt={`Post by ${post.user?.name}`}
                   loading="lazy"
@@ -281,7 +288,10 @@ export default function Middlebar() {
           )}
 
           <div className="mt-2 flex items-center space-x-3">
-            {/* <Heart className="text-zinc-500 hover:text-red-500 cursor-pointer" /> */}
+            <Heart
+              onClick={handleLike}
+              className="text-zinc-500 hover:text-red-500 cursor-pointer"
+            />
             {post.imageUrl && (
               <Link
                 className="text-zinc-500"
