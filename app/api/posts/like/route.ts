@@ -21,10 +21,7 @@ export async function POST(req: NextRequest) {
     });
 
     if (!user) {
-      return NextResponse.json(
-        { message: "User not found" },
-        { status: 404 }
-      );
+      return NextResponse.json({ message: "User not found" }, { status: 404 });
     }
 
     // Check if like exists
@@ -70,4 +67,4 @@ export async function POST(req: NextRequest) {
       { status: 500 }
     );
   }
-} 
+}

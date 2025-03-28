@@ -276,7 +276,7 @@ export default function Middlebar() {
   const renderPostItem = useCallback(
     (post: PostWithImage) => {
       if (!post) return null;
-
+      console.log(post.isLikedByUser);
       return (
         <div
           key={post.id}
@@ -367,7 +367,6 @@ export default function Middlebar() {
                   {post.likeCount || 0}
                 </span>
               </button>
-              <span></span>
 
               {post.imageUrl && (
                 <Link
