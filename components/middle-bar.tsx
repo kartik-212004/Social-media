@@ -7,6 +7,7 @@ import Loading from "@/app/loading";
 import { useToast } from "@/hooks/use-toast";
 import axios from "axios";
 import { Input } from "./ui/input";
+import { motion } from "framer-motion";
 import { Image as Gallery } from "lucide-react";
 import { ExternalLink, File } from "lucide-react";
 import { useProfileImage } from "@/hooks/useProfileImage";
@@ -37,6 +38,7 @@ type PostWithImage = Post & {
 };
 
 export default function Middlebar() {
+  const [showHeartMap, setShowHeartMap] = useState<Record<string, boolean>>({});
   const { imageUrl } = useProfileImage();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
@@ -83,11 +85,35 @@ export default function Middlebar() {
     }
   }, []);
 
-  const handleLike = async (postId: string) => {
+  const handleLike = async (postId: string, isDoubleClick: boolean = false) => {
     if (!session?.user?.email) {
       toast({ title: "Please login to like posts" });
       return;
     }
+
+    const currentPost = fetchPost.find((post) => post.id === postId);
+    if (!currentPost) return;
+
+    const willBeLiked = !currentPost.isLikedByUser;
+
+    if (isDoubleClick && willBeLiked) {
+      setShowHeartMap((prev) => ({ ...prev, [postId]: true }));
+      setTimeout(() => {
+        setShowHeartMap((prev) => ({ ...prev, [postId]: false }));
+      }, 1000);
+    }
+
+    setFetchPost((prev) =>
+      prev.map((post) =>
+        post.id === postId
+          ? {
+              ...post,
+              likeCount: (post.likeCount || 0) + (willBeLiked ? 1 : -1),
+              isLikedByUser: willBeLiked,
+            }
+          : post
+      )
+    );
 
     try {
       const response = await axios.post("/api/posts/like", {
@@ -95,25 +121,32 @@ export default function Middlebar() {
         email: session.user.email,
       });
 
-      if (response.data.success) {
+      if (!response.data.success) {
         setFetchPost((prev) =>
           prev.map((post) =>
             post.id === postId
               ? {
                   ...post,
-                  likeCount:
-                    (post.likeCount || 0) + (response.data.liked ? 1 : -1),
-                  isLikedByUser: response.data.liked,
+                  likeCount: (post.likeCount || 0) - (willBeLiked ? 1 : -1),
+                  isLikedByUser: !willBeLiked,
                 }
               : post
           )
         );
-
-        toast({
-          title: response.data.liked ? "Post liked!" : "Post unliked!",
-        });
+        toast({ title: "Failed to update like status" });
       }
     } catch (error) {
+      setFetchPost((prev) =>
+        prev.map((post) =>
+          post.id === postId
+            ? {
+                ...post,
+                likeCount: (post.likeCount || 0) - (willBeLiked ? 1 : -1),
+                isLikedByUser: !willBeLiked,
+              }
+            : post
+        )
+      );
       console.error("Like operation failed:", error);
       toast({ title: "Failed to like post" });
     }
@@ -266,7 +299,7 @@ export default function Middlebar() {
   const renderPostItem = useCallback(
     (post: PostWithImage) => {
       if (!post) return null;
-      console.log(post.isLikedByUser);
+
       return (
         <div
           key={post.id}
@@ -326,9 +359,9 @@ export default function Middlebar() {
                   <div className="relative w-full aspect-video">
                     <Image
                       onDoubleClick={() => {
-                        if (post.imageUrl) window.open(post.imageUrl, "_blank");
+                        handleLike(post.id, true);
                       }}
-                      className="rounded-xl object-cover"
+                      className="rounded-xl object-cover cursor-pointer"
                       fill
                       sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                       priority={false}
@@ -336,6 +369,17 @@ export default function Middlebar() {
                       alt={`Post by ${post.user?.name}`}
                       loading="lazy"
                     />
+                    {showHeartMap[post.id] && (
+                      <motion.div
+                        initial={{ scale: 0, opacity: 0 }}
+                        animate={{ scale: 1.5, opacity: 1 }}
+                        exit={{ scale: 0, opacity: 0 }}
+                        transition={{ duration: 0.3 }}
+                        className="absolute inset-0 flex items-center justify-center pointer-events-none"
+                      >
+                        <Heart className="text-red-500 w-20 h-20" fill="red" />
+                      </motion.div>
+                    )}
                   </div>
                 )}
               </>
@@ -343,7 +387,7 @@ export default function Middlebar() {
 
             <div className="mt-2 flex items-center space-x-3">
               <button
-                onClick={() => handleLike(post.id)}
+                onClick={() => handleLike(post.id, false)}
                 className="flex items-center space-x-1"
               >
                 <Heart
