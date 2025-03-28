@@ -320,19 +320,19 @@ export default function Middlebar() {
           <div className="flex-1">
             <div className="flex items-center py-2 space-x-2">
               <span
-                className="font-semibold cursor-pointer hover:underline"
+                className="font-medium text-[15px] cursor-pointer hover:underline"
                 onClick={() => handleUserClick(post.user?.id)}
               >
                 {post.user?.name}
               </span>
-              <span className="text-zinc-500 text-sm">
+              <span className="text-[13px] text-zinc-500">
                 {new Date(post.createdAt).toLocaleString()}
               </span>
             </div>
-            <p className="my-2">
+            <p className="my-2 text-[15px] leading-[1.5]">
               {post.Caption.split(" ").map((word, index) =>
                 word.startsWith("#") ? (
-                  <span key={index} className="text-indigo-500">
+                  <span key={index} className="text-indigo-500 font-medium">
                     {word}{" "}
                   </span>
                 ) : (
@@ -382,40 +382,40 @@ export default function Middlebar() {
               </>
             )}
 
-            <div className="mt-2 flex items-center space-x-3">
+            <div className="mt-2 flex items-center space-x-4">
               <button
                 onClick={() => handleLike(post.id, false)}
-                className="flex items-center space-x-1"
+                className="flex items-center space-x-1.5"
               >
                 <Heart
-                  className={`h-5 w-5 cursor-pointer transition-colors ${
+                  className={`h-[18px] w-[18px] cursor-pointer transition-colors ${
                     post.isLikedByUser
                       ? "text-red-500 fill-red-500"
                       : "text-zinc-500 hover:text-red-500"
                   }`}
                 />
-                <span className="text-sm text-zinc-500">
+                <span className="text-[13px] font-medium text-zinc-600 dark:text-zinc-400">
                   {post.likeCount || 0}
                 </span>
               </button>
 
               {post.imageUrl && (
                 <Link
-                  className="text-zinc-500"
+                  className="text-zinc-600 dark:text-zinc-400"
                   target="_blank"
                   rel="noopener noreferrer"
                   href={post.imageUrl}
                 >
-                  <ExternalLink />
+                  <ExternalLink className="h-[18px] w-[18px]" />
                 </Link>
               )}
-              <span className="text-zinc-500">0</span>
+              <span className="text-[13px] font-medium text-zinc-600 dark:text-zinc-400">0</span>
               {!tabBar && (
                 <span
                   onClick={() => DeletePost(post.id)}
-                  className="text-zinc-500 hover:text-red-500 cursor-pointer"
+                  className="text-zinc-600 dark:text-zinc-400 hover:text-red-500 cursor-pointer"
                 >
-                  <Trash2Icon />
+                  <Trash2Icon className="h-[18px] w-[18px]" />
                 </span>
               )}
             </div>
@@ -432,7 +432,7 @@ export default function Middlebar() {
         <div className="flex border-y-2 dark:border-zinc-800 flex-row w-full">
           <button
             onClick={() => setTabBar(true)}
-            className={`w-1/2 py-4 text-lg font-semibold transition-all duration-200 `}
+            className={`w-1/2 py-4 text-[15px] font-medium transition-all duration-200 `}
           >
             <span
               className={`py-2 ${
@@ -446,7 +446,7 @@ export default function Middlebar() {
           </button>
           <button
             onClick={() => setTabBar(false)}
-            className={`w-1/2 py-4 text-lg font-semibold transition-all duration-200`}
+            className={`w-1/2 py-4 text-[15px] font-medium transition-all duration-200`}
           >
             <span
               className={`py-2 ${
@@ -516,11 +516,11 @@ export default function Middlebar() {
               <button
                 onClick={handlePost}
                 disabled={!caption.trim() || isPosting}
-                className="py-2 px-5 rounded-3xl font-medium 
-      bg-blue-500 text-white 
-      hover:bg-blue-600 
-      disabled:opacity-50 disabled:cursor-not-allowed 
-      transition-colors"
+                className="py-2 px-5 rounded-3xl text-[14px] font-medium 
+                bg-blue-500 text-white 
+                hover:bg-blue-600 
+                disabled:opacity-50 disabled:cursor-not-allowed 
+                transition-colors"
               >
                 {isPosting ? "Posting..." : "POST"}
               </button>
@@ -533,7 +533,7 @@ export default function Middlebar() {
             ) : fetchPost.length > 0 ? (
               fetchPost.map(renderPostItem)
             ) : (
-              <div className="p-4 text-center text-zinc-500">
+              <div className="p-4 text-center text-[15px] font-medium text-zinc-500">
                 No posts available
               </div>
             )}
@@ -546,7 +546,9 @@ export default function Middlebar() {
           ) : userpost.length > 0 ? (
             userpost.map(renderPostItem)
           ) : (
-            <div className="p-4 text-center text-zinc-500">No posts yet</div>
+            <div className="p-4 text-center text-[15px] font-medium text-zinc-500">
+              No posts yet
+            </div>
           )}
         </div>
       )}
