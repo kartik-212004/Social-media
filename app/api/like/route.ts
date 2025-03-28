@@ -1,6 +1,6 @@
 import { PrismaClient } from "@prisma/client";
 import { NextResponse, NextRequest } from "next/server";
-import { getServerSession } from "next-auth";
+// import { getServerSession } from "next-auth";
 const prisma = new PrismaClient();
 
 export async function POST(req: NextRequest) {
@@ -38,18 +38,18 @@ export async function POST(req: NextRequest) {
   }
 }
 
-export async function GET(req: Request) {
-  const session = await getServerSession();
-  if (!session) return NextResponse.json({ liked: false });
+// export async function GET(req: Request) {
+//   const session = await getServerSession();
+//   if (!session) return NextResponse.json({ liked: false });
 
-  const { searchParams } = new URL(req.url);
-  const postId = searchParams.get("postId");
+//   const { searchParams } = new URL(req.url);
+//   const postId = searchParams.get("postId");
 
-  if (!postId) return NextResponse.json({ liked: false });
+//   if (!postId) return NextResponse.json({ liked: false });
 
-  const existingLike = await prisma.like.findFirst({
-    where: { userId: session.user.id, postId },
-  });
+//   const existingLike = await prisma.like.findFirst({
+//     where: { userId: session.user.id, postId },
+//   });
 
-  return NextResponse.json({ liked: !!existingLike });
-}
+//   return NextResponse.json({ liked: !!existingLike });
+// }

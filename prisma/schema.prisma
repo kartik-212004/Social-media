@@ -32,11 +32,10 @@ model Post {
   Caption   String
   mimeType  String?
   createdAt DateTime @default(now())
-  likes     Int?
   user      user?    @relation(fields: [userId], references: [id])
   postName  String?
   userId    String?
-  Like      Like[]
+  likes     Like[]
 }
 
 model Link {

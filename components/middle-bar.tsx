@@ -14,6 +14,13 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 // import { useUserImage } from "@/hooks/useAwsImage";
 
+type SessionUser = {
+  id?: string;
+  name?: string | null;
+  email?: string | null;
+  image?: string | null;
+};
+
 type Post = {
   id: string;
   Caption: string;
@@ -21,6 +28,7 @@ type Post = {
   postName?: string;
   mimeType: string;
   userId?: string;
+  likes?: { userId: string }[];
   user?: {
     id?: string;
     name?: string;
@@ -31,11 +39,12 @@ type Post = {
 type PostWithImage = Post & {
   imageUrl?: string;
   userAvatarUrl?: string;
+  likeCount?: number;
+  isLikedByUser?: boolean;
 };
 
 export default function Middlebar() {
   const { imageUrl } = useProfileImage();
-  const [Like, setLike] = useState();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
   const { data: session } = useSession();
@@ -81,17 +90,39 @@ export default function Middlebar() {
     }
   }, []);
 
-  const handleLike = async (postId: string, userId: string) => {
-    // console.log(session?.user?.email);
-    console.log(postId, userId);
-    try {
-      const response = await axios.post("/api/like", { postId, userId });
-      const data = response.data;
+  const handleLike = async (postId: string) => {
+    if (!session?.user?.email) {
+      toast({ title: "Please login to like posts" });
+      return;
+    }
 
-      toast({ title: data.message });
-      setLike(data.message);
+    try {
+      const response = await axios.post("/api/posts/like", {
+        postId,
+        email: session.user.email,
+      });
+
+      if (response.data.success) {
+        setFetchPost((prev) =>
+          prev.map((post) =>
+            post.id === postId
+              ? {
+                  ...post,
+                  likeCount:
+                    (post.likeCount || 0) + (response.data.liked ? 1 : -1),
+                  isLikedByUser: response.data.liked,
+                }
+              : post
+          )
+        );
+
+        toast({
+          title: response.data.liked ? "Post liked!" : "Post unliked!",
+        });
+      }
     } catch (error) {
-      console.error(error);
+      console.error("Like operation failed:", error);
+      toast({ title: "Failed to like post" });
     }
   };
 
@@ -121,10 +152,17 @@ export default function Middlebar() {
       const response = await axios.get("/api/posts/public-posts");
       const posts = response.data.post;
       const signedUrls = response.data.link;
+      const likeCounts = response.data.likeCounts;
 
       let postsWithImages = posts.map((post: Post) => ({
         ...post,
         imageUrl: signedUrls[post.id],
+        likeCount: likeCounts[post.id],
+        isLikedByUser:
+          post.likes?.some(
+            (like: { userId: string }) =>
+              like.userId === (session?.user as SessionUser)?.id
+          ) || false,
       }));
 
       postsWithImages = await fetchUserAvatars(postsWithImages);
@@ -135,7 +173,7 @@ export default function Middlebar() {
     } finally {
       setIsLoadingPublicPosts(false);
     }
-  }, [toast, fetchUserAvatars]);
+  }, [(session?.user as SessionUser)?.id, toast, fetchUserAvatars]);
 
   const fetchUserPost = useCallback(async () => {
     if (!isLoadingUserPosts) setIsLoadingUserPosts(true);
@@ -235,118 +273,128 @@ export default function Middlebar() {
     }
   };
 
-  const renderPostItem = useCallback((post: PostWithImage) => {
-    if (!post) return null;
+  const renderPostItem = useCallback(
+    (post: PostWithImage) => {
+      if (!post) return null;
 
-    return (
-      <div
-        key={post.id}
-        className="p-4 px-6 hover:bg-zinc-100 dark:hover:bg-[#070707] transition-colors duration-200 flex items-start space-x-4"
-      >
-        <Avatar
-          className="mt-2 cursor-pointer"
-          onClick={() => handleUserClick(post.user?.id)}
+      return (
+        <div
+          key={post.id}
+          className="p-4 px-6 hover:bg-zinc-100 dark:hover:bg-[#070707] transition-colors duration-200 flex items-start space-x-4"
         >
-          <AvatarImage
-            key={post.id}
-            src={post.userAvatarUrl || ""}
-            alt="User Avatar"
-            className="object-cover"
-          />
-          <AvatarFallback>
-            <Camera />
-          </AvatarFallback>
-        </Avatar>
+          <Avatar
+            className="mt-2 cursor-pointer"
+            onClick={() => handleUserClick(post.user?.id)}
+          >
+            <AvatarImage
+              key={post.id}
+              src={post.userAvatarUrl || ""}
+              alt="User Avatar"
+              className="object-cover"
+            />
+            <AvatarFallback>
+              <Camera />
+            </AvatarFallback>
+          </Avatar>
 
-        <div className="flex-1">
-          <div className="flex items-center py-2 space-x-2">
-            <span
-              className="font-semibold cursor-pointer hover:underline"
-              onClick={() => handleUserClick(post.user?.id)}
-            >
-              {post.user?.name}
-            </span>
-            <span className="text-zinc-500 text-sm">
-              {new Date(post.createdAt).toLocaleString()}
-            </span>
-          </div>
-          <p className="my-2">
-            {post.Caption.split(" ").map((word, index) =>
-              word.startsWith("#") ? (
-                <span key={index} className="text-indigo-500">
-                  {word}{" "}
-                </span>
-              ) : (
-                word + " "
-              )
-            )}
-          </p>
-          {post.imageUrl && (
-            <>
-              {post.mimeType?.startsWith("video/") ? (
-                <video
-                  onDoubleClick={() => {
-                    if (post.imageUrl) window.open(post.imageUrl, "_blank");
-                  }}
-                  muted
-                  className="w-full max-h-[60vh] rounded-xl object-cover"
-                  src={post.imageUrl}
-                  controls
-                />
-              ) : (
-                <div className="relative w-full aspect-video">
-                  <Image
+          <div className="flex-1">
+            <div className="flex items-center py-2 space-x-2">
+              <span
+                className="font-semibold cursor-pointer hover:underline"
+                onClick={() => handleUserClick(post.user?.id)}
+              >
+                {post.user?.name}
+              </span>
+              <span className="text-zinc-500 text-sm">
+                {new Date(post.createdAt).toLocaleString()}
+              </span>
+            </div>
+            <p className="my-2">
+              {post.Caption.split(" ").map((word, index) =>
+                word.startsWith("#") ? (
+                  <span key={index} className="text-indigo-500">
+                    {word}{" "}
+                  </span>
+                ) : (
+                  word + " "
+                )
+              )}
+            </p>
+            {post.imageUrl && (
+              <>
+                {post.mimeType?.startsWith("video/") ? (
+                  <video
                     onDoubleClick={() => {
                       if (post.imageUrl) window.open(post.imageUrl, "_blank");
                     }}
-                    className="rounded-xl object-cover"
-                    fill
-                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                    priority={false}
+                    muted
+                    className="w-full max-h-[60vh] rounded-xl object-cover"
                     src={post.imageUrl}
-                    alt={`Post by ${post.user?.name}`}
-                    loading="lazy"
+                    controls
                   />
-                </div>
+                ) : (
+                  <div className="relative w-full aspect-video">
+                    <Image
+                      onDoubleClick={() => {
+                        if (post.imageUrl) window.open(post.imageUrl, "_blank");
+                      }}
+                      className="rounded-xl object-cover"
+                      fill
+                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                      priority={false}
+                      src={post.imageUrl}
+                      alt={`Post by ${post.user?.name}`}
+                      loading="lazy"
+                    />
+                  </div>
+                )}
+              </>
+            )}
+
+            <div className="mt-2 flex items-center space-x-3">
+              <button
+                onClick={() => handleLike(post.id)}
+                className="flex items-center space-x-1"
+              >
+                <Heart
+                  className={`h-5 w-5 cursor-pointer transition-colors ${
+                    post.isLikedByUser
+                      ? "text-red-500 fill-red-500"
+                      : "text-zinc-500 hover:text-red-500"
+                  }`}
+                />
+                <span className="text-sm text-zinc-500">
+                  {post.likeCount || 0}
+                </span>
+              </button>
+              <span></span>
+
+              {post.imageUrl && (
+                <Link
+                  className="text-zinc-500"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  href={post.imageUrl}
+                >
+                  <ExternalLink />
+                </Link>
               )}
-            </>
-          )}
-
-          <div className="mt-2 flex items-center space-x-3">
-            <Heart
-              onClick={() => {
-                if (!post.user?.id) return;
-                handleLike(post.id, post.user.id);
-              }}
-              className={`text-zinc-500 cursor-pointer ${
-                Like === "Liked" ? "hover:text-red-500" : ""
-              }`}
-            />
-
-            {post.imageUrl && (
-              <Link
-                className="text-zinc-500"
-                target="_blank"
-                rel="noopener noreferrer"
-                href={post.imageUrl}
-              >
-                <ExternalLink />
-              </Link>
-            )}
-            <span className="text-zinc-500">0</span>
-            {!tabBar && (
-              <span
-                onClick={() => DeletePost(post.id)}
-                className="text-zinc-500 hover:text-red-500 cursor-pointer"
-              >
-                <Trash2Icon />
-              </span>
-            )}
+              <span className="text-zinc-500">0</span>
+              {!tabBar && (
+                <span
+                  onClick={() => DeletePost(post.id)}
+                  className="text-zinc-500 hover:text-red-500 cursor-pointer"
+                >
+                  <Trash2Icon />
+                </span>
+              )}
+            </div>
           </div>
         </div>
-      </div>
-    );
-  }, []);
+      );
+    },
+    [handleLike]
+  );
 
   return (
     <div className="border-x-2 min-h-screen dark:border-zinc-800 xl:w-1/2 w-full relative">
