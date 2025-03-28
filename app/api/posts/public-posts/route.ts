@@ -62,10 +62,8 @@ export async function GET() {
           });
         }
 
-        // Set like count for each post
         likeCounts[post.id] = post.likes?.length || 0;
 
-        // Set like status for each post if user is logged in
         if (currentUserId) {
           userLikeStatus[post.id] =
             post.likes?.some((like) => like.userId === currentUserId) || false;

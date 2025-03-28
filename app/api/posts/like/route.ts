@@ -14,7 +14,6 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Get user ID from email
     const user = await prisma.user.findUnique({
       where: { email },
       select: { id: true },
@@ -27,7 +26,6 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Check if like exists
     const existingLike = await prisma.like.findFirst({
       where: {
         postId,
@@ -38,7 +36,6 @@ export async function POST(req: NextRequest) {
     let liked: boolean;
 
     if (existingLike) {
-      // Unlike
       await prisma.like.delete({
         where: {
           id: existingLike.id,
@@ -46,7 +43,6 @@ export async function POST(req: NextRequest) {
       });
       liked = false;
     } else {
-      // Like
       await prisma.like.create({
         data: {
           post: { connect: { id: postId } },
@@ -56,13 +52,11 @@ export async function POST(req: NextRequest) {
       liked = true;
     }
 
-    // Get updated like count
     const updatedPost = await prisma.post.findUnique({
       where: { id: postId },
       include: { likes: true },
     });
 
-    // Set a cookie to remember the like status
     const response = NextResponse.json({
       success: true,
       liked,
@@ -70,12 +64,11 @@ export async function POST(req: NextRequest) {
       message: liked ? "Post liked successfully" : "Post unliked successfully",
     });
 
-    // Set cookie with user's email
     response.cookies.set('user-email', email, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'strict',
-      maxAge: 30 * 24 * 60 * 60 // 30 days
+      maxAge: 30 * 24 * 60 * 60 
     });
 
     return response;

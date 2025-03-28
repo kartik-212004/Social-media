@@ -2,16 +2,13 @@ import { WebSocketServer } from 'ws';
 import { WebSocket } from 'ws';
 import express from 'express';
 
-// Create express app if HTTP endpoints are needed
 const app = express();
 const PORT = process.env.PORT || 8081;
 
-// Initialize WebSocket server
 const wss = new WebSocketServer({ port:8080 });
 
 let clientCount = 0;
 
-// Broadcast to all clients
 function broadcast(data) {
   wss.clients.forEach(client => {
     if (client.readyState === WebSocket.OPEN) {
@@ -20,7 +17,6 @@ function broadcast(data) {
   });
 }
 
-// Send client count to all clients
 function broadcastClientCount() {
   broadcast(JSON.stringify({
     type: 'clientCount',
@@ -46,12 +42,10 @@ wss.on('connection', function connection(ws) {
   });
 });
 
-// Express routes
 app.get('/', (req, res) => {
   res.send('WebSocket server is running');
 });
 
-// Start Express server if we have HTTP routes
 app.listen(PORT, () => {
   console.log(`HTTP server listening on port ${PORT}`);
 });
