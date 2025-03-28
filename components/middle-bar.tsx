@@ -14,13 +14,6 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 // import { useUserImage } from "@/hooks/useAwsImage";
 
-type SessionUser = {
-  id?: string;
-  name?: string | null;
-  email?: string | null;
-  image?: string | null;
-};
-
 type Post = {
   id: string;
   Caption: string;
@@ -153,16 +146,13 @@ export default function Middlebar() {
       const posts = response.data.post;
       const signedUrls = response.data.link;
       const likeCounts = response.data.likeCounts;
+      const userLikeStatus = response.data.userLikeStatus;
 
       let postsWithImages = posts.map((post: Post) => ({
         ...post,
         imageUrl: signedUrls[post.id],
         likeCount: likeCounts[post.id],
-        isLikedByUser:
-          post.likes?.some(
-            (like: { userId: string }) =>
-              like.userId === (session?.user as SessionUser)?.id
-          ) || false,
+        isLikedByUser: userLikeStatus[post.id] || false,
       }));
 
       postsWithImages = await fetchUserAvatars(postsWithImages);
@@ -173,7 +163,7 @@ export default function Middlebar() {
     } finally {
       setIsLoadingPublicPosts(false);
     }
-  }, [(session?.user as SessionUser)?.id, toast, fetchUserAvatars]);
+  }, [toast, fetchUserAvatars]);
 
   const fetchUserPost = useCallback(async () => {
     if (!isLoadingUserPosts) setIsLoadingUserPosts(true);
