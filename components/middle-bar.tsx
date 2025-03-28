@@ -12,6 +12,7 @@ import { Image as Gallery } from "lucide-react";
 import { ExternalLink, File } from "lucide-react";
 import { useProfileImage } from "@/hooks/useProfileImage";
 import { useRouter } from "next/navigation";
+import { Textarea } from "@heroui/input";
 import Link from "next/link";
 // import { useUserImage } from "@/hooks/useAwsImage";
 
@@ -152,25 +153,21 @@ export default function Middlebar() {
     }
   };
 
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+  const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
       handlePost();
     }
   };
 
-  const handleInput = useCallback(
-    (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-      const textarea = textAreaRef.current;
-      setCaption(e.target.value);
+  // const handleInput = useCallback((e) => {
+  //   setCaption(e.target.value);
 
-      if (textarea) {
-        textarea.style.height = "auto";
-        textarea.style.height = `${textarea.scrollHeight}px`;
-      }
-    },
-    []
-  );
+  //   // if (textarea) {
+  //   //   textarea.style.height = "auto";
+  //   //   textarea.style.height = `${textarea.scrollHeight}px`;
+  //   // }
+  // }, []);
 
   const fetchPosts = useCallback(async () => {
     if (!isLoadingPublicPosts) setIsLoadingPublicPosts(true);
@@ -482,14 +479,18 @@ export default function Middlebar() {
               </div>
 
               <div className="w-4/5">
-                <textarea
+                <Textarea
                   ref={textAreaRef}
                   value={caption}
-                  rows={1}
-                  placeholder="What's cooking in your mind?"
-                  className="w-full bg-transparent placeholder:text-xl text-2xl resize-none overflow-hidden border-b-2 border-zinc-700 focus:outline-none p-2"
-                  onChange={handleInput}
+                  label="What's cooking in your mind?"
+                  className="w-full p-1"
+                  onChange={(e) => setCaption(e.target.value)}
                   onKeyDown={handleKeyDown}
+                  variant="underlined"
+                  classNames={{
+                    label: "text-xl",
+                    input: "h-6 min-h-0 p-0 text-sm",
+                  }}
                 />
               </div>
             </div>
