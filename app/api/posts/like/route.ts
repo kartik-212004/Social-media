@@ -21,7 +21,10 @@ export async function POST(req: NextRequest) {
     });
 
     if (!user) {
-      return NextResponse.json({ message: "User not found" }, { status: 404 });
+      return NextResponse.json(
+        { message: "User not found" },
+        { status: 404 }
+      );
     }
 
     // Check if like exists
@@ -32,6 +35,8 @@ export async function POST(req: NextRequest) {
       },
     });
 
+    let liked: boolean;
+
     if (existingLike) {
       // Unlike
       await prisma.like.delete({
@@ -39,12 +44,7 @@ export async function POST(req: NextRequest) {
           id: existingLike.id,
         },
       });
-
-      return NextResponse.json({
-        success: true,
-        liked: false,
-        message: "Post unliked successfully",
-      });
+      liked = false;
     } else {
       // Like
       await prisma.like.create({
@@ -53,13 +53,32 @@ export async function POST(req: NextRequest) {
           user: { connect: { id: user.id } },
         },
       });
-
-      return NextResponse.json({
-        success: true,
-        liked: true,
-        message: "Post liked successfully",
-      });
+      liked = true;
     }
+
+    // Get updated like count
+    const updatedPost = await prisma.post.findUnique({
+      where: { id: postId },
+      include: { likes: true },
+    });
+
+    // Set a cookie to remember the like status
+    const response = NextResponse.json({
+      success: true,
+      liked,
+      likeCount: updatedPost?.likes.length || 0,
+      message: liked ? "Post liked successfully" : "Post unliked successfully",
+    });
+
+    // Set cookie with user's email
+    response.cookies.set('user-email', email, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      maxAge: 30 * 24 * 60 * 60 // 30 days
+    });
+
+    return response;
   } catch (error) {
     console.error("Like operation failed:", error);
     return NextResponse.json(

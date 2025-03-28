@@ -2,6 +2,7 @@ import { PrismaClient } from "@prisma/client";
 import { NextResponse } from "next/server";
 import { S3Client, GetObjectCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
+import { cookies } from "next/headers";
 
 const prisma = new PrismaClient();
 const s3client = new S3Client({
@@ -14,6 +15,18 @@ const s3client = new S3Client({
 
 export async function GET() {
   try {
+    const cookieStore = await cookies();
+    const userEmail = cookieStore.get("user-email")?.value;
+
+    let currentUserId: string | undefined;
+    if (userEmail) {
+      const user = await prisma.user.findUnique({
+        where: { email: userEmail },
+        select: { id: true },
+      });
+      currentUserId = user?.id;
+    }
+
     const newPost = await prisma.post.findMany({
       include: {
         user: {
@@ -25,11 +38,7 @@ export async function GET() {
             imageName: true,
           },
         },
-        likes: {
-          select: {
-            userId: true,
-          },
-        },
+        likes: true, // Include all likes
       },
       orderBy: {
         createdAt: "desc",
@@ -38,6 +47,7 @@ export async function GET() {
 
     const signedUrls: Record<string, string> = {};
     const likeCounts: Record<string, number> = {};
+    const userLikeStatus: Record<string, boolean> = {};
 
     await Promise.all(
       newPost.map(async (post) => {
@@ -51,7 +61,15 @@ export async function GET() {
             expiresIn: 93600,
           });
         }
+
+        // Set like count for each post
         likeCounts[post.id] = post.likes?.length || 0;
+
+        // Set like status for each post if user is logged in
+        if (currentUserId) {
+          userLikeStatus[post.id] =
+            post.likes?.some((like) => like.userId === currentUserId) || false;
+        }
       })
     );
 
@@ -60,6 +78,7 @@ export async function GET() {
       post: newPost,
       link: signedUrls,
       likeCounts: likeCounts,
+      userLikeStatus: userLikeStatus,
     });
   } catch (error) {
     console.error("Error fetching posts:", error);
