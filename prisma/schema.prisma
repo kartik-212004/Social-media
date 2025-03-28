@@ -24,6 +24,7 @@ model user {
   link      Link[]
   imageName String?
   imageUrl  String?
+  Like      Like[]
 }
 
 model Post {
@@ -31,10 +32,10 @@ model Post {
   Caption   String
   mimeType  String?
   createdAt DateTime @default(now())
-  likes     Int?
   user      user?    @relation(fields: [userId], references: [id])
   postName  String?
   userId    String?
+  likes     Like[]
 }
 
 model Link {
@@ -42,4 +43,12 @@ model Link {
   url    String  @unique
   user   user?   @relation(fields: [userId], references: [id])
   userId String?
+}
+
+model Like {
+  id     String  @id @default(uuid())
+  user   user?   @relation(fields: [userId], references: [id])
+  userId String?
+  post   Post?   @relation(fields: [postId], references: [id])
+  postId String?
 }

@@ -25,6 +25,11 @@ export async function GET() {
             imageName: true,
           },
         },
+        likes: {
+          select: {
+            userId: true,
+          },
+        },
       },
       orderBy: {
         createdAt: "desc",
@@ -32,6 +37,7 @@ export async function GET() {
     });
 
     const signedUrls: Record<string, string> = {};
+    const likeCounts: Record<string, number> = {};
 
     await Promise.all(
       newPost.map(async (post) => {
@@ -45,6 +51,7 @@ export async function GET() {
             expiresIn: 93600,
           });
         }
+        likeCounts[post.id] = post.likes?.length || 0;
       })
     );
 
@@ -52,6 +59,7 @@ export async function GET() {
       message: "Post retrieval successful",
       post: newPost,
       link: signedUrls,
+      likeCounts: likeCounts,
     });
   } catch (error) {
     console.error("Error fetching posts:", error);
