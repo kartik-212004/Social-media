@@ -409,7 +409,6 @@ export default function Middlebar() {
                   <ExternalLink className="h-[18px] w-[18px]" />
                 </Link>
               )}
-              <span className="text-[13px] font-medium text-zinc-600 dark:text-zinc-400">0</span>
               {!tabBar && (
                 <span
                   onClick={() => DeletePost(post.id)}
