@@ -227,7 +227,10 @@ export default function Middlebar() {
       const formData = new FormData();
       if (file) formData.append("file", file);
       formData.append("email", session?.user?.email ?? "");
-      formData.append("caption", caption);
+      formData.append(
+        "caption",
+        caption.charAt(0).toUpperCase() + caption.substring(1)
+      );
 
       await axios.post("/api/posts/upload", formData, {
         headers: { "Content-Type": "multipart/form-data" },
